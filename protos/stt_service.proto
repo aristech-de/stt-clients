@@ -1,0 +1,439 @@
+syntax = "proto3";
+
+package ari.stt.v1;
+
+import "google/protobuf/duration.proto";
+
+service SttService {
+  // Transcribe a stream of audio.
+  rpc StreamingRecognize(stream StreamingRecognitionRequest)
+      returns (stream StreamingRecognitionResponse) {}
+
+  // List all supported models.
+  rpc Models(ModelsRequest) returns (ModelsResponse) {}
+
+  // List all available nlp server configs and corresponding functions.
+  rpc NLPFunctions(NLPFunctionsRequest) returns (NLPFunctionsResponse) {}
+
+  // List all supported locales.
+  // @deprecated Use Models instead.
+  rpc Locales(LocalesRequest) returns (LocalesResponse) {
+    // Use models instead.
+    option deprecated = true;
+  };
+
+  rpc AccountInfo(AccountInfoRequest) returns (AccountInfoResponse) {}
+
+  // Processes the given text with the given nlp pipeline.
+  rpc NLPProcess(NLPProcessRequest) returns (NLPProcessResponse) {}
+}
+
+// The top-level message sent by the client for the `StreamingRecognize` method.
+message StreamingRecognitionRequest {
+  // The initial request is expected to contain a `RecognitionConfig`
+  // so that the server knows which language to transcribe for example.
+  oneof streaming_request {
+    // The configuration for the stream.
+    // This is the first message that must be sent.
+    RecognitionConfig config = 1;
+    // The audio data to be recognized.
+    bytes audio_content = 2;
+  }
+}
+
+// The top-level message returned from the `StreamingRecognize` method.
+message StreamingRecognitionResponse {
+  reserved 2;
+  reserved "end_of_single_utterance";
+  // List of results that are currently available.
+  repeated SpeechRecognitionChunk chunks = 1;
+  // A short id that is used in the stt-server logs to differentiate between
+  // different client requests. Be aware that this id should only be used for
+  // debugging purposes because it is not collision safe.
+  string client_id = 3;
+  // The language identified by the server, e.g. en, de, etc.
+  string language = 4;
+}
+
+// The `RecognitionConfig` message provides information to the recognizer that
+// specifies how to process the request.
+message RecognitionConfig {
+  // Specifies what kind of audio is being sent and how the recognizer should
+  // process it.
+  RecognitionSpec specification = 1;
+}
+
+// The `RecognitionSpec` message provides information to the recognizer that
+// specifies how to process the request.
+message RecognitionSpec {
+  reserved 4;
+  reserved "profanity_filter";
+
+  enum AudioEncoding {
+    // If not specified, defaults to LINEAR16_PCM.
+    AUDIO_ENCODING_UNSPECIFIED = 0;
+    // 16-bit signed little-endian (Linear PCM)
+    LINEAR16_PCM = 1;
+  }
+
+  // At the moment only LINEAR16 is supported.
+  AudioEncoding audio_encoding = 1;
+  // 8000, 16000, 48000 only for pcm.
+  int64 sample_rate_hertz = 2;
+  // [language[_territory]] e.g. en, en-IN, de.
+  string locale = 3;
+  // load a specific graph for the locale specific model (e.g. yes_no).
+  string graph = 5;
+  // Allows to specify a grammar to be used for the recognition.
+  // To specify a JSGF grammar for example set grammar to `jsgf:public <yes_no>
+  // = yes | no;` To spot a keyword / phrase, set grammar to `kws:oh mighty
+  // computer` You can also specify a json string to narrow the possible words
+  // to appear `["oh one two three four five six seven eight nine zero",
+  // "[unk]"]`.
+  string grammar = 6;
+  // If set true, tentative hypotheses may be returned as they become available
+  // (final=false flag) If false or omitted, only final=true result(s) are
+  // returned. Makes sense only for StreamingRecognize requests.
+  bool partial_results = 7;
+  // Decode as single utterance.
+  bool single_utterance = 8;
+  // Specifies how text should be normalized.
+  NormalizationSpec normalization = 9;
+  // When set, the recognizer opts out of MBR decoding and produces phoneme
+  // infos.
+  bool phones = 10;
+  // Instead of picking a model based on the locale, this field can be used to
+  // specify a specific model directly.
+  // To specify a graph model directly use model:graph e.g.
+  // generic-model-de-0.21:ja_nein
+  string model = 11;
+  // For models that use endpointing (e.g. STT-Core models) this field can be
+  // used to specify the endpointing configuration.
+  EndpointSpec endpointing = 12;
+  // For models that use voice activity detection (VAD) this field can be used
+  // to specify the VAD configuration.
+  VadSpec vad = 13;
+}
+
+// The `NormalizationSpec` message provides information to the recognizer that
+// specifies which normalizer to use.
+message NormalizationSpec {
+  reserved 1, 3;
+  reserved "raw_results", "strip_slots";
+  // Whether to strip unknown label in the resulting text
+  // Note: The unknown label can still be accessed via the `words` field
+  bool strip_unk = 2;
+  // Allows to specify which nlp functions should be applied to the text
+  // before it is returned. By specifying this field, the default nlp
+  // configuration is overwritten.
+  NLPSpec nlp = 4;
+}
+
+message NLPSpec {
+  // The server config name of the server that provides the nlp functions.
+  string server_config = 1;
+  // Which nlp functions should be applied to the text before it is returned.
+  repeated NLPFunctionSpec functions = 2;
+  // Whether to apply the nlp functions to the partial results.
+  bool partial_results = 3;
+  // Optional global argument.
+  string args = 4;
+
+  enum NlpInputField {
+    // If not specified, defaults to TEXT.
+    UNSPECIFIED = 0;
+    // The text field is used as input for the nlp processing.
+    TEXT = 1;
+    // Use the tagged_text field as input for the nlp processing.
+    TAGGED_TEXT = 2;
+    // Use the slotted_text field as input for the nlp processing.
+    SLOTTED_TEXT = 3;
+  }
+
+  // Specifies which field should be used as input for the nlp functions.
+  NlpInputField input_field = 5;
+}
+
+// The `NLPFunction` message provides information to the recognizer that
+// specifies which nlp function to use.
+message NLPFunctionSpec {
+  // The id of the nlp function (e.g. `ner-de`).
+  string id = 1;
+  // Optional additional parameters for the nlp function (e.g. `ANONYMIZE`).
+  repeated string args = 2;
+}
+
+// Endpointing configuration for LM based endpointing.
+message EndpointSpec {
+  // How many seconds of non-speech before the endpointer triggers to
+  // clean up the buffer.
+  float silence_timeout = 1;
+  // How many seconds of non-speech after some speech with high
+  // probability for an endpoint before the endpointer triggers.
+  float trailing_silence_high_probability = 2;
+  // How many seconds of non-speech after some speech with low probability
+  // for an endpoint before the endpointer triggers.
+  float trailing_silence_ok_probability = 3;
+  // How many seconds of non-speech without the endpointer reaching a
+  // final state before the endpointer triggers.
+  float trailing_silence_no_endpoint = 4;
+  // After how many seconds of audio to trigger and endpoint regardless
+  // of anything else.
+  float utterance_timeout = 5;
+}
+
+// Endpointing configuration for Voice activity detection (VAD) based
+// endpointing.
+message VadSpec {
+  // The threshold between 0 and 1.0 to determine if a frame is speech or
+  // non-speech. A higher threshold will result in less false positives but also
+  // some speech might be cut off.
+  float threshold = 1;
+  // Amount of trailing silence before an utterance is considered after a speech
+  // to non-speech transition.
+  float trailing_silence = 2;
+  // The minimum duration of speech in seconds before trying to perform a
+  // partial recognition.
+  float min_speech = 3;
+}
+
+// The `SpeechRecognitionChunk` message contains the result of a single
+// utterance.
+message SpeechRecognitionChunk {
+  // The transcription alternatives.
+  repeated SpeechRecognitionAlternative alternatives = 1;
+  // This flag indicates if the transcription is final or not.
+  bool final = 2;
+  // This flag shows that the received chunk is the end of an utterance.
+  bool end_of_utterance = 3;
+}
+
+// The `SpeechRecognitionAlternative` message contains one alternative of a
+// transcription.
+message SpeechRecognitionAlternative {
+  reserved 4;
+  reserved "normalized_text";
+  // The raw recognized text.
+  string text = 1;
+  // When the model is composed of multiple nested language models, this field
+  // contains the recognized text including xml tags that indicate which
+  // language model produced which part of the text. e.g. "i live in <address>
+  // <number> 21 </number> <street> jumpstreet </street> <city> heidelberg
+  // </city> </address>"
+  string slotted_text = 7;
+  // The tagged recognized text.
+  string tagged_text = 5;
+  // The nlp result.
+  string nlp_text = 6;
+  // The overall confidence of the recognition result.
+  float confidence = 2;
+  // Word level infos such as start and end time offsets, word level
+  // confidences, or phoneme infos.
+  repeated WordInfo words = 3;
+}
+
+// The `WordInfo` message contains the word level information.
+message WordInfo {
+  reserved 6, 8;
+  reserved "raw_word", "entity_label";
+  // The word's start time, in seconds.
+  google.protobuf.Duration start_time = 1;
+  // The word's end time, in seconds.
+  google.protobuf.Duration end_time = 2;
+  // The word.
+  string word = 3;
+  // The confidence of the word in the range [0.0, 1.0].
+  float confidence = 4;
+  // Phoneme infos.
+  repeated PhoneInfo phones = 5;
+  // Speech recognition slot the word belongs to.
+  // For nested slots, the slots are joined with a dot and ordered from outer to
+  // inner
+  // e.g.: "i live in <address> <number> 21 </number> <street> jumpstreet
+  // </street> heidelberg </address>"
+  // will have the following slots:
+  // i -> ''
+  // live -> ''
+  // in -> ''
+  // 21 -> 'address.number'
+  // jumpstreet -> 'address.street'
+  // heidelberg -> 'address'
+  string slot = 7;
+}
+
+// The `PhoneInfo` message contains the phoneme level information.
+message PhoneInfo {
+  // The phone's start time, in seconds.
+  google.protobuf.Duration start_time = 1;
+  // The phone's end time, in seconds.
+  google.protobuf.Duration end_time = 2;
+  // The phone.
+  string phone = 3;
+}
+
+// The `ModelsRequest` message currently contains no information.
+message ModelsRequest {}
+
+// The `ModelsResponse` message contains the list of supported models.
+message ModelsResponse {
+  // List of supported models.
+  repeated Model model = 1;
+}
+
+// The `Model` message contains the information about a single model.
+message Model {
+  // The model id.
+  // e.g. generic-model-de-0.21
+  string id = 1;
+  // The human readable model name (for display purposes).
+  // e.g. German Generic Model (Large)
+  string name = 8;
+  // The model description.
+  string description = 9;
+  // The model version.
+  string version = 10;
+  // The model type.
+  ModelType type = 2;
+  // The locale(s) supported by the model.
+  repeated string locale = 3;
+  // Which grammar types are supported by the model.
+  repeated GrammarType grammar_type = 4;
+  // The NLP preconfiguration for this model (if any).
+  NLPSpec nlp = 5;
+  // The slots the model potentially outputs.
+  repeated string slots = 6;
+  // Examples of what the model can recognize.
+  repeated string examples = 7;
+  // The supported endpointing modes.
+  repeated EndpointingType endpointing = 11;
+}
+
+enum EndpointingType {
+  // Endpointing that considers the language model.
+  LM = 0;
+  // VAD based endpointing.
+  VAD = 1;
+}
+
+enum ModelType {
+  // Core-STT model type.
+  CORE_STT = 0;
+  // Grammar-STT model type (these models are used for grammar recognition or
+  // keyword spotting)
+  GRAMMAR_STT = 1;
+  // Whisper-STT model type.
+  WHISPER_STT = 2;
+  // Speaker diarization model type.
+  DIARIZATION = 3;
+}
+
+enum GrammarType {
+  // JSGF grammar type.
+  // Example grammar: `jsgf:<yes_no> = yes | no;`
+  JSGF = 0;
+  // SRGS grammar type.
+  // Example grammar: `srgs:$yes_no = yes | no;`
+  SRGS = 3;
+  // Keyword / Keyphrase spotting grammar type.
+  // Example grammar: `kws:oh mighty computer|hey computer`
+  KWS = 1;
+  // A simple json phrase list grammar type.
+  // Example grammar: `["yes", "yeah", "yep", "why not", "no", "nope"]`
+  PHRASE_LIST = 2;
+}
+
+// The `NLPFunctionsRequest` message currently contains no information.
+message NLPFunctionsRequest {}
+
+// The `NLPFunctionsResponse` message contains the list of supported nlp
+// servers and the corresponding functions.
+message NLPFunctionsResponse {
+  // List of supported nlp servers.
+  repeated NLPFunctionServer server = 1;
+}
+
+message NLPFunctionServer {
+  // The nlp server configuration name (to be used in `NLPSpec`).
+  string server_config = 1;
+  // The nlp functions supported by the nlp server.
+  repeated NLPFunction functions = 3;
+}
+
+// The `NLPFunction` message contains the information about a single nlp
+// function.
+message NLPFunction {
+  // The nlp function id.
+  string id = 1;
+  // The nlp function name.
+  string name = 2;
+  // The nlp function description.
+  string description = 3;
+}
+
+// The `LocalesRequest` message currently contains no information.
+message LocalesRequest {}
+
+// The `LocalesResponse` message contains the list of supported locales.
+message LocalesResponse {
+  // List of supported locales.
+  repeated Locale locale = 1;
+}
+
+// The `Locale` message contains the information about a single locale.
+message Locale {
+  reserved 2;
+  reserved "graph_names";
+  // The locale as specified within the model.
+  // e.g. en_US, de_DE, etc.
+  string locale = 1;
+  // Whether language model adaptations are supported during runtime by
+  // specifying a simple json phrase list as grammar.
+  bool dynamic = 3;
+  // The models that are available for this locale
+  repeated string model = 4;
+  // The available custom graphs for this locale
+  repeated Graph graphs = 5;
+}
+
+// The `Graph` message contains the information about a single graph.
+message Graph {
+  // The name of the graph
+  string name = 1;
+  reserved 2;
+  reserved "normalizers";
+}
+
+// The `AccountInfoRequest` message currently contains no information.
+message AccountInfoRequest {}
+
+// The `AccountInfoResponse` message contains the account information.
+message AccountInfoResponse {
+  // The account token.
+  string token = 1;
+  // The account display name.
+  string display_name = 2;
+  // How many requests were made with this account.
+  int64 total_requests = 3;
+  // How many seconds of audio this account has booked.
+  int64 booked_seconds = 4;
+  // How many seconds of audio this account has used.
+  int64 used_seconds = 5;
+  // Expiration date of the account as unix timestamp (-1 for unlimited).
+  int64 expiration_date = 6;
+  // Whether the account is blocked.
+  bool blocked = 7;
+}
+
+// The `NLPProcessRequest` message contains the text to be processed.
+message NLPProcessRequest {
+  // The text to be processed.
+  string text = 1;
+  // The nlp specification.
+  NLPSpec nlp = 2;
+}
+
+// The `NLPProcessResponse` message contains the processed text.
+message NLPProcessResponse {
+  // The processed text.
+  string text = 1;
+}

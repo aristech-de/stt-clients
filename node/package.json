@@ -1,0 +1,51 @@
+{
+  "name": "@aristech-org/stt-client",
+  "version": "5.0.0",
+  "description": "Aristech STT-Client",
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "typings": "dist/index.d.ts",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "tsx --test",
+    "start": "tsx watch src/index.ts",
+    "build": "tsc -p . && rm -rf dist/generated && cp -r src/generated dist/generated",
+    "generate": "mkdir -p src/generated && ./proto2Typescript.sh",
+    "type-check": "tsc --noEmit",
+    "prepare": "simple-git-hooks"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npm run type-check"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aristech-de/stt-clients.git"
+  },
+  "keywords": [
+    "stt",
+    "client",
+    "grpc"
+  ],
+  "author": "Martin Mende",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/aristech-de/stt-clients/issues"
+  },
+  "homepage": "https://github.com/aristech-de/stt-clients#readme",
+  "devDependencies": {
+    "@types/node": "^22.7.6",
+    "simple-git-hooks": "^2.11.1",
+    "ts-proto": "^2.2.4",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@grpc/grpc-js": "^1.12.2"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  }
+}

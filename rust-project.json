@@ -1,0 +1,19 @@
+{
+  "roots": [
+    {
+      "path": "rust"
+    }
+  ],
+  "crates": [
+    {
+      "root_module": "rust/src/lib.rs",
+      "edition": "2021",
+      "deps": []
+    },
+    {
+      "root_module": "rust/src/stt.rs",
+      "edition": "2021",
+      "deps": []
+    }
+  ]
+}

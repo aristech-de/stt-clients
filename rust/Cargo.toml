@@ -1,0 +1,42 @@
+[package]
+name = "aristech-stt-client"
+version = "1.0.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tonic = { version = "0.12.3", features = ["tls", "tls-roots", "gzip"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+tokio-stream = "0.1"
+prost = "0.13.3"
+prost-types = "0.13.3"
+clap = { version = "4.1.6", features = ["derive"] }
+colored = "2.0.0"
+hound = "3.5.0"
+cpal = "0.15.0"
+inquire = { version = "0.7.5" }
+regex = "1.8.1"
+chrono = "0.4.31"
+
+[dev-dependencies]
+serde = { version = "1.0.152", features = ["derive"] }
+
+[[bin]]
+name = "stt"
+path = "src/stt.rs"
+
+[build-dependencies]
+tonic-build = "0.12.3"
+
+[[example]]
+name = "file"
+path = "examples/file.rs"
+
+[[example]]
+name = "live"
+path = "examples/live.rs"
+
+[[example]]
+name = "benchmark"
+path = "examples/benchmark.rs"
