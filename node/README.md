@@ -13,7 +13,7 @@ npm install @aristech-org/stt-client
 ```typescript
 import { SttClient, RecognitionConfig } from '@aristech-org/stt-client';
 
-const client = new SttClient('localhost:9424');
+const client = new SttClient({ host: 'stt.example.com' });
 const result = await client.recognizeFile('path/to/audio/file.wav')
 console.log(result.chunks[0].alternatives[0].text);
 ```
