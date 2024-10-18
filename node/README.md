@@ -14,7 +14,7 @@ npm install @aristech-org/stt-client
 import { SttClient, RecognitionConfig } from '@aristech-org/stt-client';
 
 const client = new SttClient('localhost:9424');
-const result = await client.recognize('path/to/audio/file.wav')
+const result = await client.recognizeFile('path/to/audio/file.wav')
 console.log(result.chunks[0].alternatives[0].text);
 ```
 
