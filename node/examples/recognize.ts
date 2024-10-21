@@ -1,7 +1,28 @@
-import { getClientOptions, getWaveFilePath } from './utils.js'
+// Run: npx tsx examples/recognize.ts [path to wave file]
+import 'dotenv/config'
 
 import { SttClient } from '@aristech-org/stt-client'
+import fs from 'fs'
+import path from 'path'
 
-const client = new SttClient(getClientOptions())
-const result = await client.recognizeFile(getWaveFilePath())
-console.log(result.chunks[0].alternatives[0].text)
+// Use the second command line argument as the path to the wave file
+let fileName = process.argv[2]
+if (!fileName) {
+  // Fallback to test.wav in the repository root
+  const scriptDir = path.dirname(new URL(import.meta.url).pathname)
+  fileName = path.join(scriptDir, '../../test.wav')
+} else if (!fs.existsSync(fileName) || !fileName.endsWith('.wav')) {
+  console.error(`The file ${fileName} does not exist or does not end with .wav`)
+  process.exit(1)
+}
+
+const auth = process.env.TOKEN && process.env.SECRET ? { token: process.env.TOKEN, secret: process.env.SECRET } : undefined
+
+const client = new SttClient({
+  host: process.env.HOST,
+  ssl: Boolean(auth) || Boolean(process.env.ROOT_CERT) || process.env.SSL === 'true',
+  rootCert: process.env.ROOT_CERT,
+  auth,
+})
+const results = await client.recognizeFile(fileName)
+console.log(results.map(r => r.chunks[0].alternatives[0].text).join('\n'))
