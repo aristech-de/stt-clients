@@ -1,88 +1,30 @@
+// Usage: cargo run --example file [<path_to_wav_file>]
+
 use std::error::Error;
 
 use aristech_stt_client::{
-    get_client,
-    stt_service::{
-        streaming_recognition_request, RecognitionConfig, RecognitionSpec,
-        StreamingRecognitionRequest,
-    },
-    Auth, SttClient, TlsOptions,
+    get_client, recognize_file, stt_service::RecognitionSpec, Auth, TlsOptions,
 };
 use tonic::codegen::CompressionEncoding;
 
-pub async fn streaming_recognize(
-    mut client: SttClient,
-    audio_path: &str,
-    locale: &str,
-) -> Result<(), Box<dyn Error>> {
-    let wav_reader = hound::WavReader::open(audio_path)?;
-    let sample_rate_hertz = wav_reader.spec().sample_rate as i64;
-    println!("Sample rate: {}", sample_rate_hertz);
-
-    let config = RecognitionConfig {
-        specification: Some(RecognitionSpec {
-            audio_encoding: 1,
-            sample_rate_hertz,
-            locale: locale.to_string(),
-            graph: "".to_string(),
-            grammar: "".to_string(),
-            partial_results: true,
-            single_utterance: false,
-            normalization: None,
-            phones: false,
-            model: "".to_string(),
-            endpointing: None,
-            vad: None,
-        }),
-    };
-    let initial_request = StreamingRecognitionRequest {
-        streaming_request: Some(streaming_recognition_request::StreamingRequest::Config(
-            config,
-        )),
-    };
-    let audio_content = std::fs::read(audio_path)?;
-    // Remove the header of the wav file
-    let audio_content = &audio_content[44..];
-    let audio_request = StreamingRecognitionRequest {
-        streaming_request: Some(
-            streaming_recognition_request::StreamingRequest::AudioContent(audio_content.to_vec()),
-        ),
-    };
-
-    // Create an tokio_stream where the first item is the initial request
-    let input_stream = tokio_stream::iter(vec![initial_request, audio_request]);
-
-    let mut stream = client.streaming_recognize(input_stream).await?.into_inner();
-
-    while let Some(response) = stream.message().await? {
-        for chunk in response.chunks {
-            let response_type = match chunk.end_of_utterance {
-                true => "Final",
-                false => "Partial",
-            };
-            for alternative in chunk.alternatives {
-                println!(
-                    "ClientID {}, Locale: {}, {}: {}",
-                    response.client_id, response.language, response_type, alternative.text
-                );
-            }
-        }
-    }
-    Ok(())
-}
-
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+    // Load environment variables from .env file
+    dotenv::dotenv()?;
+
     let host = std::env::var("HOST")?;
     let token = std::env::var("TOKEN")?;
     let secret = std::env::var("SECRET")?;
     // For self-signed certificates we would need to read the certificate file into a string
     // and set ca_certificate to Some(ca_certificate_string)
     let root_cert = match std::env::var("ROOT_CERT") {
-        Ok(root_cert) => {
-            let root_cert = std::fs::read_to_string(root_cert)?;
-            Some(root_cert)
-        }
+        Ok(root_cert) => match root_cert.is_empty() {
+            true => None,
+            false => {
+                let root_cert = std::fs::read_to_string(root_cert)?;
+                Some(root_cert)
+            }
+        },
         Err(_) => None,
     };
     let client = get_client(
@@ -96,15 +38,55 @@ async fn main() -> Result<(), Box<dyn Error>> {
     .accept_compressed(CompressionEncoding::Gzip)
     .send_compressed(CompressionEncoding::Gzip);
 
-    let file = std::env::args().nth(1).unwrap_or_else(|| {
-        println!("Usage: file <path to audio file>");
-        std::process::exit(1);
+    let file_path = std::env::args().nth(1).unwrap_or_else(|| {
+        // Use test.wav from the repository root as default
+        // Get the path to the rust directory
+        let project_dir = env!("CARGO_MANIFEST_DIR");
+        let file_path = std::path::Path::new(project_dir)
+            .join("..")
+            .join("test.wav")
+            .to_str()
+            .unwrap()
+            .to_string();
+        file_path
     });
-    let file = file.as_str();
-    // Get file relative to manifest directory
-    let file = std::path::Path::new(file).to_str().unwrap();
+    // Assure the file ends with .wav
+    assert!(
+        file_path.ends_with(".wav"),
+        "recognize_file only supports .wav files"
+    );
+    // Assure the file exists
+    assert!(
+        std::path::Path::new(&file_path).exists(),
+        "File does not exist"
+    );
+    let file_path = file_path.as_str();
 
-    streaming_recognize(client, file, "en").await?;
+    // Get file relative to manifest directory
+    let file_path = std::path::Path::new(file_path).to_str().unwrap();
+    let results = recognize_file(
+        client,
+        file_path,
+        Some(RecognitionSpec {
+            model: std::env::var("MODEL").unwrap_or_else(|_| "".to_string()),
+            ..RecognitionSpec::default()
+        }),
+    )
+    .await?;
+
+    for result in results {
+        println!(
+            "{}",
+            result
+                .chunks
+                .get(0)
+                .unwrap()
+                .alternatives
+                .get(0)
+                .unwrap()
+                .text
+        );
+    }
 
     Ok(())
 }

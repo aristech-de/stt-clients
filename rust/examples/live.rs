@@ -23,6 +23,9 @@ fn f32_to_pcm16(data: &[f32]) -> Vec<u8> {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Load environment variables from .env file
+    dotenv::dotenv().ok();
+
     // Clear the terminal
     print!("{}[2J", 27 as char);
     // Move the cursor to the top left
@@ -79,7 +82,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     single_utterance: false,
                     normalization: None,
                     phones: false,
-                    model: "".to_string(),
+                    model: std::env::var("MODEL").unwrap_or_else(|_| "".to_string()),
                     endpointing: None,
                     vad: None,
                 }),

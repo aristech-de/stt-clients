@@ -1,11 +1,11 @@
 use std::error::Error;
 
-use aristech_stt_client::{get_client, get_models, Auth, TlsOptions};
+use aristech_stt_client::{get_client, get_nlp_functions, Auth, TlsOptions};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     // Load environment variables from .env file
-    dotenv::dotenv().ok();
+    dotenv::dotenv()?;
 
     let host = std::env::var("HOST")?;
     let token = std::env::var("TOKEN")?;
@@ -31,9 +31,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     )
     .await?;
 
-    let models = get_models(client, None).await?;
-    for model in models.model {
-        println!("{:?}", model);
-    }
+    let function_infos = get_nlp_functions(client, None).await?;
+    println!("{:#?}", function_infos);
+
     Ok(())
 }
