@@ -160,19 +160,20 @@ pub async fn nlp_process(
 pub async fn recognize_file(
     mut client: SttClient,
     file_path: &str,
-    spec: Option<RecognitionSpec>,
+    config: Option<RecognitionConfig>,
 ) -> Result<Vec<StreamingRecognitionResponse>, Box<dyn Error>> {
     let mut responses = Vec::new();
     // Read the file with hound::WavReader
     let wav_reader = hound::WavReader::open(file_path)?;
     let sample_rate_hertz = wav_reader.spec().sample_rate as i64;
+    let spec = config.unwrap_or_default().specification.unwrap_or_default();
     let initial_request = StreamingRecognitionRequest {
         streaming_request: Some(StreamingRequest::Config(RecognitionConfig {
             specification: Some(RecognitionSpec {
                 sample_rate_hertz,        // Set sample_rate_hertz from the WAV file
                 partial_results: false,   // We don't want partial results for files
                 locale: "en".to_string(), // Set locale to English
-                ..spec.unwrap_or_default()
+                ..spec
             }),
             // At the moment there is nothing besides the specification in the config so we can use the default
             ..RecognitionConfig::default()

@@ -3,7 +3,9 @@
 use std::error::Error;
 
 use aristech_stt_client::{
-    get_client, recognize_file, stt_service::RecognitionSpec, Auth, TlsOptions,
+    get_client, recognize_file,
+    stt_service::{RecognitionConfig, RecognitionSpec},
+    Auth, TlsOptions,
 };
 use tonic::codegen::CompressionEncoding;
 
@@ -64,12 +66,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // Get file relative to manifest directory
     let file_path = std::path::Path::new(file_path).to_str().unwrap();
+    // The recognize_file function accepts a wav file and will set the sample rate for you
     let results = recognize_file(
         client,
         file_path,
-        Some(RecognitionSpec {
-            model: std::env::var("MODEL").unwrap_or_else(|_| "".to_string()),
-            ..RecognitionSpec::default()
+        Some(RecognitionConfig {
+            specification: Some(RecognitionSpec {
+                model: std::env::var("MODEL").unwrap_or_else(|_| "".to_string()),
+                ..RecognitionSpec::default()
+            }),
         }),
     )
     .await?;
