@@ -22,9 +22,11 @@
     "url": "git+https://github.com/aristech-de/stt-clients.git"
   },
   "keywords": [
-    "stt",
-    "client",
-    "grpc"
+    "speech-recognition",
+    "speech-to-text",
+    "real-time",
+    "streaming",
+    "client-library"
   ],
   "author": "Martin Mende",
   "license": "MIT",
