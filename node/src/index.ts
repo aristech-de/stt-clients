@@ -14,12 +14,12 @@ import {
   Model,
   StreamingRecognitionResponse,
   DeepPartial,
-} from './generated/stt_service';
+} from './generated/stt_service.js';
 
 import fs from 'fs'
 
 // Re-export generated types
-export * from './generated/stt_service'
+export * from './generated/stt_service.js'
 
 export interface ConnectionOptions {
   /**

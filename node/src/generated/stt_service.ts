@@ -20,7 +20,7 @@ import {
   type ServiceError,
   type UntypedServiceImplementation,
 } from "@grpc/grpc-js";
-import { Duration } from "./google/protobuf/duration";
+import { Duration } from "./google/protobuf/duration.js";
 
 export const protobufPackage = "ari.stt.v1";
 
