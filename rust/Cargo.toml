@@ -1,5 +1,6 @@
 [package]
 name = "aristech-stt-client"
+description = "A Rust client library for the Aristech Speech-to-Text API"
 version = "1.0.0"
 edition = "2021"
 repository = "https://github.com/aristech-de/stt-clients"
@@ -10,6 +11,10 @@ keywords = [
   "streaming",
   "client-library",
 ]
+homepage = "https://github.com/aristech-de/stt-clients/blob/main/rust/README.md"
+authors = ["Martin Mende"]
+license = "MIT"
+categories = ["api-bindings", "multimedia::audio"]
 
 [dependencies]
 tonic = { version = "0.12.3", features = ["tls", "tls-roots", "gzip"] }
@@ -41,5 +46,17 @@ name = "live"
 path = "examples/live.rs"
 
 [[example]]
-name = "benchmark"
-path = "examples/benchmark.rs"
+name = "account"
+path = "examples/account.rs"
+
+[[example]]
+name = "models"
+path = "examples/models.rs"
+
+[[example]]
+name = "nlpFunctions"
+path = "examples/nlpFunctions.rs"
+
+[[example]]
+name = "nlpProcess"
+path = "examples/nlpProcess.rs"
