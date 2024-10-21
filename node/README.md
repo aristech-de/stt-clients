@@ -11,11 +11,11 @@ npm install @aristech-org/stt-client
 ## Usage
 
 ```typescript
-import { SttClient, RecognitionConfig } from '@aristech-org/stt-client';
+import { SttClient } from '@aristech-org/stt-client'
 
-const client = new SttClient({ host: 'stt.example.com' });
-const result = await client.recognizeFile('path/to/audio/file.wav')
-console.log(result.chunks[0].alternatives[0].text);
+const client = new SttClient({ host: 'stt.example.com' })
+const results = await client.recognizeFile('path/to/audio/file.wav')
+console.log(results.map(r => r.chunks[0].alternatives[0].text).join('\n'))
 ```
 
 There are several examples in the `examples` directory:
