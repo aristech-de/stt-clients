@@ -9,7 +9,7 @@
   "scripts": {
     "test": "tsx --test",
     "start": "tsx watch src/index.ts",
-    "build": "tsc -p . && rm -rf dist/generated && cp -r src/generated dist/generated",
+    "build": "tsc -p .",
     "generate": "mkdir -p src/generated && ./proto2Typescript.sh",
     "type-check": "tsc --noEmit",
     "prepare": "simple-git-hooks"
