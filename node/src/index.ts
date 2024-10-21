@@ -13,8 +13,8 @@ import {
   StreamingRecognitionRequest,
   Model,
   StreamingRecognitionResponse,
-  RecognitionSpec,
-} from './generated/stt_service'
+  DeepPartial,
+} from './generated/stt_service';
 
 import fs from 'fs'
 
@@ -64,10 +64,11 @@ export class SttClient {
   /**
    * Lists the available models and their specifications.
    */
-  listModels(request = ModelsRequest.create()): Promise<Model[]> {
+  listModels(request?: DeepPartial<ModelsRequest>): Promise<Model[]> {
     return new Promise((res, rej) => {
       const client = this.getClient()
-      client.models(request, (error, response) => {
+      const req = ModelsRequest.create(request)
+      client.models(req, (error, response) => {
         if (error) {
           rej(error)
           return
@@ -82,7 +83,7 @@ export class SttClient {
    * @param config The recognition configuration.
    * @returns The recognition stream.
    */
-  recognize(config: RecognitionConfig) {
+  recognize(config: DeepPartial<RecognitionConfig>) {
     const client = this.getClient()
     const call = client.streamingRecognize()
     const request = StreamingRecognitionRequest.create({ config })
@@ -95,18 +96,19 @@ export class SttClient {
    * Recognizes a wave file.
    * This is a convenience method to very easily recognize a wave file.
    * @param waveFilePath Path to the wave file.
-   * @param config The recognition configuration.
+   * @param config The recognition configuration. The sample rate is automatically determined from the wave file. If you don't provide a config, only the locale will be set to 'en' so that the server can determine which model to use. We usually recomment to provide a specific model however.
    * @returns The recognition response.
    */
-  recognizeFile(waveFilePath: string, spec?: RecognitionSpec) {
+  recognizeFile(waveFilePath: string, config?: DeepPartial<RecognitionConfig>) {
     const client = this.getClient()
     const call = client.streamingRecognize()
-    const sampleRate = spec?.sampleRateHertz || getWaveSampleRate(waveFilePath)
+    const sampleRate = config?.specification?.sampleRateHertz || getWaveSampleRate(waveFilePath)
     const request = StreamingRecognitionRequest.create({
       config: {
+        ...config,
         specification: {
-          locale: 'en-US',
-          ...spec,
+          locale: 'en',
+          ...config?.specification,
           sampleRateHertz: sampleRate,
           partialResults: false,
         }
@@ -121,12 +123,16 @@ export class SttClient {
     stream.on('end', () => {
       call.end()
     })
-    return new Promise<StreamingRecognitionResponse>((res, rej) => {
+    return new Promise<StreamingRecognitionResponse[]>((res, rej) => {
+      const result: StreamingRecognitionResponse[] = []
       call.on('data', (response: StreamingRecognitionResponse) => {
-        res(response)
+        result.push(response)
       })
       call.on('error', (error) => {
         rej(error)
+      })
+      call.on('end', () => {
+        res(result)
       })
     })
   }
@@ -136,10 +142,11 @@ export class SttClient {
    * @param request The NLP functions request.
    * @returns The NLP functions response.
    */
-  listNlpFunctions(request = NLPFunctionsRequest.create()): Promise<NLPFunctionsResponse> {
+  listNlpFunctions(request?: DeepPartial<NLPFunctionsRequest>): Promise<NLPFunctionsResponse> {
     return new Promise((res, rej) => {
       const client = this.getClient()
-      client.nlpFunctions(request, (error, response) => {
+      const req = NLPFunctionsRequest.create(request)
+      client.nlpFunctions(req, (error, response) => {
         if (error) {
           rej(error)
           return
@@ -154,10 +161,11 @@ export class SttClient {
    * @param request The NLP processing request.
    * @returns The NLP processing response.
    */
-  nlpProcess(request = NLPProcessRequest.create()): Promise<NLPProcessResponse> {
+  nlpProcess(request: DeepPartial<NLPProcessRequest>): Promise<NLPProcessResponse> {
     return new Promise((res, rej) => {
       const client = this.getClient()
-      client.nlpProcess(request, (error, response) => {
+      const req = NLPProcessRequest.create(request)
+      client.nlpProcess(req, (error, response) => {
         if (error) {
           rej(error)
           return
