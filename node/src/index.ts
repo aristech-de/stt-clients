@@ -14,7 +14,7 @@ import {
   Model,
   StreamingRecognitionResponse,
   DeepPartial,
-} from './generated/stt_service.js';
+} from './generated/stt_service.js'
 
 import fs from 'fs'
 
@@ -23,8 +23,7 @@ export * from './generated/stt_service.js'
 
 export interface ConnectionOptions {
   /**
-   * The Aristech STT-Server uri e.g. cloud.aristech.de:5001
-   * @default localhost:5001
+   * The Aristech STT-Server uri e.g. stt.aristech.cloud
    */
   host?: string
   /**
@@ -180,10 +179,11 @@ export class SttClient {
    * @param request The account info request.
    * @returns The account info response.
    */
-  accountInfo(request = AccountInfoRequest.create()): Promise<AccountInfoResponse> {
+  accountInfo(request: DeepPartial<AccountInfoRequest>): Promise<AccountInfoResponse> {
     return new Promise((res, rej) => {
       const client = this.getClient()
-      client.accountInfo(request, (error, response) => {
+      const req = AccountInfoRequest.create(request)
+      client.accountInfo(req, (error, response) => {
         if (error) {
           rej(error)
           return
@@ -194,8 +194,8 @@ export class SttClient {
   }
 
   private getClient() {
-    const { rootCert: rootCertPath, rootCertContent, auth } = this.cOptions
-    let host = this.cOptions.host || 'stt.aristech.cloud'
+    const { rootCert: rootCertPath, rootCertContent, auth, grpcClientOptions } = this.cOptions
+    let host = this.cOptions.host || 'localhost:9423'
     let ssl = this.cOptions.ssl === true
     let rootCert: Buffer | null = null
     if (rootCertContent) {
@@ -242,7 +242,7 @@ export class SttClient {
         creds = grpc.credentials.combineChannelCredentials(creds, callCreds)
       }
     }
-    return new SttServiceClient(host, creds)
+    return new SttServiceClient(host, creds, grpcClientOptions)
   }
 }
 
