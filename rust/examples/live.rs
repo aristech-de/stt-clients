@@ -1,10 +1,12 @@
+mod utils;
+use utils::get_tls_options;
+
 use aristech_stt_client::{
     get_client,
     stt_service::{
         streaming_recognition_request, RecognitionConfig, RecognitionSpec,
         StreamingRecognitionRequest,
     },
-    Auth, TlsOptions,
 };
 
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
@@ -116,27 +118,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     stream.play().unwrap();
 
     let host = std::env::var("HOST")?;
-    let token = std::env::var("TOKEN")?;
-    let secret = std::env::var("SECRET")?;
-    // For self-signed certificates we would need to read the certificate file into a string
-    // and set ca_certificate to Some(ca_certificate_string)
-    let root_cert = match std::env::var("ROOT_CERT") {
-        Ok(root_cert) => {
-            let root_cert = std::fs::read_to_string(root_cert)?;
-            Some(root_cert)
-        }
-        Err(_) => None,
-    };
-    let mut client = get_client(
-        host,
-        Some(TlsOptions {
-            ca_certificate: root_cert,
-            auth: Some(Auth { token, secret }),
-        }),
-    )
-    .await?
-    .accept_compressed(CompressionEncoding::Gzip)
-    .send_compressed(CompressionEncoding::Gzip);
+    let tls_options = get_tls_options()?;
+    let mut client = get_client(host, tls_options)
+        .await?
+        .accept_compressed(CompressionEncoding::Gzip)
+        .send_compressed(CompressionEncoding::Gzip);
 
     // With the input_stream we are finally able to start the streaming recognition
     let mut response_stream = client.streaming_recognize(input_stream).await?.into_inner();
