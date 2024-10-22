@@ -23,7 +23,7 @@ export * from './generated/stt_service.js'
 
 export interface ConnectionOptions {
   /**
-   * The Aristech STT-Server uri e.g. stt.aristech.cloud
+   * The Aristech STT-Server uri e.g. stt.example.com
    */
   host?: string
   /**
