@@ -22,16 +22,10 @@ tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 tokio-stream = "0.1"
 prost = "0.13.3"
 prost-types = "0.13.3"
-clap = { version = "4.1.6", features = ["derive"] }
-colored = "2.0.0"
 hound = "3.5.0"
 cpal = "0.15.0"
-inquire = { version = "0.7.5" }
-regex = "1.8.1"
-chrono = "0.4.31"
 
 [dev-dependencies]
-serde = { version = "1.0.152", features = ["derive"] }
 dotenv = "0.15.0"
 
 [build-dependencies]
