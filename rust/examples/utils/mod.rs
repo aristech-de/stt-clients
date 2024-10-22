@@ -28,7 +28,16 @@ pub fn get_tls_options() -> Result<Option<TlsOptions>, Box<dyn Error>> {
                     ca_certificate: Some(root_cert),
                     auth: None,
                 }),
-                None => None,
+                None => match std::env::var("SSL") {
+                    Ok(ssl) => match ssl.parse::<bool>() {
+                        Ok(true) => Some(TlsOptions {
+                            ca_certificate: None,
+                            auth: None,
+                        }),
+                        _ => None,
+                    },
+                    _ => None,
+                },
             },
         }
     };
