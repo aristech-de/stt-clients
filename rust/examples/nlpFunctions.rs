@@ -11,9 +11,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let host = std::env::var("HOST")?;
     let tls_options = get_tls_options()?;
-    let client = get_client(host, tls_options).await?;
+    let mut client = get_client(host, tls_options).await?;
 
-    let function_infos = get_nlp_functions(client, None).await?;
+    let function_infos = get_nlp_functions(&mut client, None).await?;
     println!("{:#?}", function_infos);
 
     Ok(())

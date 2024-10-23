@@ -17,7 +17,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let host = std::env::var("HOST")?;
     let tls_options = get_tls_options()?;
-    let client = get_client(host, tls_options)
+    let mut client = get_client(host, tls_options)
         .await?
         .accept_compressed(CompressionEncoding::Gzip)
         .send_compressed(CompressionEncoding::Gzip);
@@ -50,7 +50,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let file_path = std::path::Path::new(file_path).to_str().unwrap();
     // The recognize_file function accepts a wav file and will set the sample rate for you
     let results = recognize_file(
-        client,
+        &mut client,
         file_path,
         Some(RecognitionConfig {
             specification: Some(RecognitionSpec {

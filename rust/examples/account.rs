@@ -11,9 +11,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let host = std::env::var("HOST")?;
     let tls_options = get_tls_options()?;
-    let client = get_client(host, tls_options).await?;
+    let mut client = get_client(host, tls_options).await?;
 
-    let info = get_account_info(client, None).await?;
+    let info = get_account_info(&mut client, None).await?;
     println!("{:#?}", info);
 
     Ok(())

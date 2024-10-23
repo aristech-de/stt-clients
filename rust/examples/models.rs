@@ -11,10 +11,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let host = std::env::var("HOST")?;
     let tls_options = get_tls_options()?;
-    let client = get_client(host, tls_options).await?;
+    let mut client = get_client(host, tls_options).await?;
 
-    let models = get_models(client, None).await?;
-    for model in models.model {
+    let response = get_models(&mut client, None).await?;
+    for model in response.model {
         println!("{:?}", model);
     }
     Ok(())

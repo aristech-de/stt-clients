@@ -8,33 +8,40 @@ Add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-aristech_stt_client = "1.0.0"
+aristech_stt_client = "2.0.0"
 ```
 
 ## Usage
 
 ```rust
-let client = get_client(
-  "https://stt.example.com",
-  Some(TlsOptions {
-      ca_certificate: None,
-      auth: Some(Auth { token: "your-token", secret: "your-secret" }),
-  }),
-).await?;
+use aristech_stt_client::{get_client, recognize_file, TlsOptions, Auth};
+use std::error::Error;
 
-let results = recognize_file(client, "path/to/audio/file.wav", None).await?;
-for result in results {
-    println!(
-        "{}",
-        result
-            .chunks
-            .get(0)
-            .unwrap()
-            .alternatives
-            .get(0)
-            .unwrap()
-            .text
-    );
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn Error>> {
+    let mut client = get_client(
+    "https://stt.example.com",
+    Some(TlsOptions {
+        ca_certificate: None,
+        auth: Some(Auth { token: "your-token", secret: "your-secret" }),
+    }),
+    ).await?;
+
+    let results = recognize_file(&mut client, "path/to/audio/file.wav", None).await?;
+    for result in results {
+        println!(
+            "{}",
+            result
+                .chunks
+                .get(0)
+                .unwrap()
+                .alternatives
+                .get(0)
+                .unwrap()
+                .text
+        );
+    }
+    Ok(())
 }
 ```
 

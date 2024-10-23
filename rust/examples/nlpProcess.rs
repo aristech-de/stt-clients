@@ -14,7 +14,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let host = std::env::var("HOST")?;
     let tls_options = get_tls_options()?;
-    let client = get_client(host, tls_options).await?;
+    let mut client = get_client(host, tls_options).await?;
 
     let server_config = std::env::var("NLP_SERVER_CONFIG").unwrap_or("default".to_string());
     let functions = std::env::var("NLP_PIPELINE").unwrap_or("spellcheck-de".to_string());
@@ -36,7 +36,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         }),
     };
 
-    let function_infos = nlp_process(client, request).await?;
+    let function_infos = nlp_process(&mut client, request).await?;
     println!("{:#?}", function_infos);
 
     Ok(())
