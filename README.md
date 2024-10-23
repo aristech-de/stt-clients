@@ -1,6 +1,6 @@
 # Aristech STT-Clients
 
-This repsoitory contains the Speech-to-Text client implementations that use [gRPC](https://grpc.io/) and [Protocol Buffers](https://developers.google.com/protocol-buffers/) to communicate with the [Aristech](https://aristech.de) STT-Server.
+This repository contains the Speech-to-Text client implementations that use [gRPC](https://grpc.io/) and [Protocol Buffers](https://developers.google.com/protocol-buffers/) to communicate with the [Aristech](https://aristech.de) STT-Server.
 
 Currently, the following clients are available:
 
