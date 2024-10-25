@@ -179,7 +179,7 @@ export class SttClient {
    * @param request The account info request.
    * @returns The account info response.
    */
-  accountInfo(request: DeepPartial<AccountInfoRequest>): Promise<AccountInfoResponse> {
+  accountInfo(request?: DeepPartial<AccountInfoRequest>): Promise<AccountInfoResponse> {
     return new Promise((res, rej) => {
       const client = this.getClient()
       const req = AccountInfoRequest.create(request)
