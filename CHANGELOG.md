@@ -1,5 +1,8 @@
 # Changelog
 
+## NodeJS v1.0.3 - 2024-10-25
+- Made accountInfo request optional.
+
 ## Rust v2.0.0 - 2024-10-23
 - Updated dependencies.
 - Added documentation.
