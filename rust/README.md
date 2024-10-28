@@ -4,11 +4,10 @@ This is the Rust client implementation for the Aristech STT-Server.
 
 ## Installation
 
-Add the following to your `Cargo.toml`:
+To use the client in your project, add it to your `Cargo.toml` or use `cargo` to add it:
 
-```toml
-[dependencies]
-aristech_stt_client = "2.0.0"
+```sh
+cargo add aristech-stt-client
 ```
 
 ## Usage
