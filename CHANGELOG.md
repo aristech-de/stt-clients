@@ -1,5 +1,9 @@
 # Changelog
 
+## Rust v2.0.1 - 2024-10-28
+- Switched from tonic tls-roots to tls-native-roots because tls-roots is deprecated.
+
+
 ## NodeJS v1.0.3 - 2024-10-25
 - Made accountInfo request optional.
 
