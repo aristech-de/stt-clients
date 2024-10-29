@@ -2,12 +2,10 @@ import grpc
 import re
 import wave
 
-from typing import Generator, Iterable
+from typing import Iterable
 
 from .proto.stt_service_pb2_grpc import *
 from .proto.stt_service_pb2 import *
-
-portRe = r"^(?P<host>[^:]+):(?P<port>[0-9]+)$"
 
 class SttClient:
     host: str
@@ -43,6 +41,7 @@ class SttClient:
         self.channel = grpc.insecure_channel(self.host)
     
     def _get_host_port(self, host, defaultSsl):
+      portRe = r"^(?P<host>[^:]+):(?P<port>[0-9]+)$"
       matches = re.search(portRe, host)
       defaultPort = defaultSsl and "9424" or "9423"
       return (host, defaultPort) if matches is None else (matches.group("host"), matches.group("port"))
