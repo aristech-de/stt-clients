@@ -20,12 +20,12 @@ print('\n'.join([r.chunks[0].alternatives[0].text for r in results]))
 
 There are several examples in the [examples](.) directory:
 
-- [recognize.py](examples/recognize.py): Demonstrates how to perform recognition on a file.
-- [streaming.py](examples/streaming.py): Demonstrates how to stream audio to the server while receiving interim results.
-- [models.py](examples/models.py): Demonstrates how to get the available models from the server.
-- [nlpFunctions.py](examples/nlpFunctions.py): Demonstrates how to list the configured NLP-Servers and the coresponding functions.
-- [nlpProcess.py](examples/nlpProcess.py): Demonstrates how to perform NLP processing on a text by using the STT-Server as a proxy.
-- [account.py](examples/account.py): Demonstrates how to retrieve the account information from the server.
+- [recognize.py](https://github.com/aristech-de/stt-clients/blob/main/python/examples/recognize.py): Demonstrates how to perform recognition on a file.
+- [streaming.py](https://github.com/aristech-de/stt-clients/blob/main/python/examples/streaming.py): Demonstrates how to stream audio to the server while receiving interim results.
+- [models.py](https://github.com/aristech-de/stt-clients/blob/main/python/examples/models.py): Demonstrates how to get the available models from the server.
+- [nlpFunctions.py](https://github.com/aristech-de/stt-clients/blob/main/python/examples/nlpFunctions.py): Demonstrates how to list the configured NLP-Servers and the coresponding functions.
+- [nlpProcess.py](https://github.com/aristech-de/stt-clients/blob/main/python/examples/nlpProcess.py): Demonstrates how to perform NLP processing on a text by using the STT-Server as a proxy.
+- [account.py](https://github.com/aristech-de/stt-clients/blob/main/python/examples/account.py): Demonstrates how to retrieve the account information from the server.
 
 You can run the examples directly using `python` like this:
 
