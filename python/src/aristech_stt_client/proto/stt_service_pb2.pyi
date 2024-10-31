@@ -234,6 +234,7 @@ class RecognitionSpec(google.protobuf.message.Message):
     MODEL_FIELD_NUMBER: builtins.int
     ENDPOINTING_FIELD_NUMBER: builtins.int
     VAD_FIELD_NUMBER: builtins.int
+    PROMPT_FIELD_NUMBER: builtins.int
     audio_encoding: global___RecognitionSpec.AudioEncoding.ValueType
     """At the moment only LINEAR16 is supported."""
     sample_rate_hertz: builtins.int
@@ -267,6 +268,11 @@ class RecognitionSpec(google.protobuf.message.Message):
     To specify a graph model directly use model:graph e.g.
     generic-model-de-0.21:ja_nein
     """
+    prompt: builtins.str
+    """Some models allow to specify a prompt that can be used to give the model
+    some context on what was said before or to steer the model to use
+    particular spellings or styles.
+    """
     @property
     def normalization(self) -> global___NormalizationSpec:
         """Specifies how text should be normalized."""
@@ -298,9 +304,10 @@ class RecognitionSpec(google.protobuf.message.Message):
         model: builtins.str = ...,
         endpointing: global___EndpointSpec | None = ...,
         vad: global___VadSpec | None = ...,
+        prompt: builtins.str = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["endpointing", b"endpointing", "normalization", b"normalization", "vad", b"vad"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "endpointing", b"endpointing", "grammar", b"grammar", "graph", b"graph", "locale", b"locale", "model", b"model", "normalization", b"normalization", "partial_results", b"partial_results", "phones", b"phones", "sample_rate_hertz", b"sample_rate_hertz", "single_utterance", b"single_utterance", "vad", b"vad"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "endpointing", b"endpointing", "grammar", b"grammar", "graph", b"graph", "locale", b"locale", "model", b"model", "normalization", b"normalization", "partial_results", b"partial_results", "phones", b"phones", "prompt", b"prompt", "sample_rate_hertz", b"sample_rate_hertz", "single_utterance", b"single_utterance", "vad", b"vad"]) -> None: ...
 
 global___RecognitionSpec = RecognitionSpec
 

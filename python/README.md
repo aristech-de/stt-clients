@@ -18,7 +18,7 @@ results = client.recognize_file("path/to/audio/file.wav", RecognitionConfig(spec
 print('\n'.join([r.chunks[0].alternatives[0].text for r in results]))
 ```
 
-There are several examples in the [examples](.) directory:
+There are several examples in the [examples](https://github.com/aristech-de/stt-clients/blob/main/python/examples/) directory:
 
 - [recognize.py](https://github.com/aristech-de/stt-clients/blob/main/python/examples/recognize.py): Demonstrates how to perform recognition on a file.
 - [streaming.py](https://github.com/aristech-de/stt-clients/blob/main/python/examples/streaming.py): Demonstrates how to stream audio to the server while receiving interim results.

@@ -31,7 +31,8 @@ it = client.recognize(
     specification=RecognitionSpec(
       sample_rate_hertz=sample_rate_hertz,
       model=model,
-      partial_results=True
+      partial_results=True,
+      single_utterance=False
     )
   ),
   audio_data(),
