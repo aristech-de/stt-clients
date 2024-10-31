@@ -44,14 +44,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
 }
 ```
 
-There are several examples in the [examples](.) directory:
+There are several examples in the [examples](https://github.com/aristech-de/stt-clients/blob/main/rust/examples/) directory:
 
-- [file.rs](examples/file.rs): Demonstrates how to perform recognition on a file.
-- [live.rs](examples/live.rs): Demonstrates how to perform live recognition using the microphone.
-- [models.rs](examples/models.rs): Demonstrates how to get the available models from the server.
-- [nlpFunctions.rs](examples/nlpFunctions.rs): Demonstrates how to list the configured NLP-Servers and the coresponding functions.
-- [nlpProcess.rs](examples/nlpProcess.rs): Demonstrates how to perform NLP processing on a text by using the STT-Server as a proxy.
-- [account.rs](examples/account.rs): Demonstrates how to retrieve the account information from the server.
+- [file.rs](https://github.com/aristech-de/stt-clients/blob/main/rust/examples/file.rs): Demonstrates how to perform recognition on a file.
+- [live.rs](https://github.com/aristech-de/stt-clients/blob/main/rust/examples/live.rs): Demonstrates how to perform live recognition using the microphone.
+- [models.rs](https://github.com/aristech-de/stt-clients/blob/main/rust/examples/models.rs): Demonstrates how to get the available models from the server.
+- [nlpFunctions.rs](https://github.com/aristech-de/stt-clients/blob/main/rust/examples/nlpFunctions.rs): Demonstrates how to list the configured NLP-Servers and the coresponding functions.
+- [nlpProcess.rs](https://github.com/aristech-de/stt-clients/blob/main/rust/examples/nlpProcess.rs): Demonstrates how to perform NLP processing on a text by using the STT-Server as a proxy.
+- [account.rs](https://github.com/aristech-de/stt-clients/blob/main/rust/examples/account.rs): Demonstrates how to retrieve the account information from the server.
 
 You can run the examples directly using `cargo` like this:
 

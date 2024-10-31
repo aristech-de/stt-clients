@@ -87,6 +87,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     model: std::env::var("MODEL").unwrap_or_else(|_| "".to_string()),
                     endpointing: None,
                     vad: None,
+                    prompt: "".to_string(),
                 }),
             },
         )),
