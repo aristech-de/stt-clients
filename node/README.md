@@ -18,14 +18,14 @@ const results = await client.recognizeFile('path/to/audio/file.wav')
 console.log(results.map(r => r.chunks[0].alternatives[0].text).join('\n'))
 ```
 
-There are several examples in the `examples` directory:
+There are several examples in the [examples](https://github.com/aristech-de/stt-clients/blob/main/node/examples/) directory:
 
-- [recognize.ts](examples/recognize.ts): Pretty much the same as the example above.
-- [streaming.ts](examples/streaming.ts): Demonstrates how to stream audio to the server while receiving interim results.
-- [models.ts](examples/models.ts): Demonstrates how to get the available models from the server.
-- [nlpFunctions.ts](examples/nlpFunctions.ts): Demonstrates how to list the configured NLP-Servers and the coresponding functions.
-- [nlpProcess.ts](examples/nlpProcess.ts): Demonstrates how to perform NLP processing on a text by using the STT-Server as a proxy.
-- [account.ts](examples/account.ts): Demonstrates how to retrieve the account information from the server.
+- [recognize.ts](https://github.com/aristech-de/stt-clients/blob/main/node/examples/recognize.ts): Pretty much the same as the example above.
+- [streaming.ts](https://github.com/aristech-de/stt-clients/blob/main/node/examples/streaming.ts): Demonstrates how to stream audio to the server while receiving interim results.
+- [models.ts](https://github.com/aristech-de/stt-clients/blob/main/node/examples/models.ts): Demonstrates how to get the available models from the server.
+- [nlpFunctions.ts](https://github.com/aristech-de/stt-clients/blob/main/node/examples/nlpFunctions.ts): Demonstrates how to list the configured NLP-Servers and the coresponding functions.
+- [nlpProcess.ts](https://github.com/aristech-de/stt-clients/blob/main/node/examples/nlpProcess.ts): Demonstrates how to perform NLP processing on a text by using the STT-Server as a proxy.
+- [account.ts](https://github.com/aristech-de/stt-clients/blob/main/node/examples/account.ts): Demonstrates how to retrieve the account information from the server.
 
 You can run the examples directly using `tsx` like this:
 

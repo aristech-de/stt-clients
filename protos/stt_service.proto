@@ -113,6 +113,10 @@ message RecognitionSpec {
   // For models that use voice activity detection (VAD) this field can be used
   // to specify the VAD configuration.
   VadSpec vad = 13;
+  // Some models allow to specify a prompt that can be used to give the model
+  // some context on what was said before or to steer the model to use
+  // particular spellings or styles.
+  string prompt = 14;
 }
 
 // The `NormalizationSpec` message provides information to the recognizer that
