@@ -3,6 +3,7 @@
 ## NodeJS v1.1.0 - 2024-10-31
 - Added support for adding a prompt to the recognition request.
 - Made readme examples links absolute
+- Updated dependencies.
 ## Python v1.1.0 - 2024-10-31
 - Added support for adding a prompt to the recognition request.
 - Made readme examples link absolute
