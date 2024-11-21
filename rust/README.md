@@ -58,14 +58,16 @@ You can run the examples directly using `cargo` like this:
 1. Create a `.env` file in the [rust](.) directory:
 
 ```sh
-HOST=https://stt.example.com # Note: The protocol is required in the rust client
+HOST=stt.example.com
 # The credentials are optional but probably required for most servers:
 TOKEN=your-token
 SECRET=your-secret
 
 # The following are optional:
 # ROOT_CERT=your-root-cert.pem # If the server uses a self-signed certificate
-# SSL=true # Set to true if credentials are provided or if a ROOT_CERT is provided
+# If neither credentials nor an explicit root certificate are provided,
+# you can still enable SSL by setting the SSL environment variable to true:
+# SSL=true
 # MODEL=some-available-model
 # NLP_SERVER=some-config
 # NLP_PIPELINE=function1,function2

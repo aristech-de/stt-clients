@@ -1,5 +1,9 @@
 # Changelog
 
+## Rust v2.1.1 - 2024-11-21
+- Fixed a bug where native roots were not being used correctly.
+- The get_client function now automatically adds a schema if it is missing from the host based on the tls options.
+
 ## NodeJS v1.1.0 - 2024-10-31
 - Added support for adding a prompt to the recognition request.
 - Made readme examples links absolute
