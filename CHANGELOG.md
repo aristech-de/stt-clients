@@ -1,5 +1,9 @@
 # Changelog
 
+## Rust v2.1.4 - 2025-01-07
+- Bumped dependencies.
+
+
 ## Rust v2.1.3 - 2024-12-05
 - Moved cpal to dev-dependencies because it is only used within the live example.
 
