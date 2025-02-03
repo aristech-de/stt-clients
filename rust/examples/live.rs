@@ -77,7 +77,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 specification: Some(RecognitionSpec {
                     audio_encoding: 0,
                     sample_rate_hertz: sample_rate,
-                    locale: "en".to_string(),
+                    locale: std::env::var("LOCALE").unwrap_or_else(|_| "".to_string()), // e.g. "en". Only relevant for multilingual models which autodetect the language if not set.
                     graph: "".to_string(),
                     grammar: "".to_string(),
                     partial_results: true,
@@ -87,7 +87,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     model: std::env::var("MODEL").unwrap_or_else(|_| "".to_string()),
                     endpointing: None,
                     vad: None,
-                    prompt: "".to_string(),
+                    prompt: std::env::var("MODEL_PROMPT").unwrap_or_else(|_| "".to_string()),
                 }),
             },
         )),

@@ -31,6 +31,10 @@ const stream = client.recognize({
     sampleRateHertz: getWaveSampleRate(fileName),
     partialResults: true,
     model: process.env.MODEL || 'generic-small-en-us-0.15',
+    // The locale is optional and only relevant for multilingual models which autodetect the language if not specified explicitly.
+    locale: process.env.LOCALE || '', // e.g. 'en
+    // Optional - Can be used for multilingual models to add a glossary with task-specific vocabulary (e.g. product names) that would otherwise be unlikely to be recognized. Can also be used to steer the recognition towards a specific writing style.
+    prompt: process.env.MODEL_PROMPT,
   }
 })
 
@@ -59,8 +63,9 @@ const waveFile = fs.createReadStream(fileName)
 // Skip the wave header (which is typically 44 bytes)
 waveFile.read(44)
 // We have to create a StreamingRecognitionRequest for each audio chunk
-waveFile.on('data', (chunk: Buffer) => {
-  stream.write({ audioContent: Uint8Array.from(chunk) })
+waveFile.on('data', (chunk: string | Buffer<ArrayBufferLike>) => {
+  const audioContent = typeof chunk === 'string' ? Uint8Array.from(Buffer.from(chunk)) : Uint8Array.from(chunk)
+  stream.write({ audioContent })
 })
 // When the wave file ends, half-close the stream to signal the end of the audio
 waveFile.on('end', () => {

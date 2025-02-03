@@ -19,5 +19,7 @@ pipeline = os.getenv("NLP_PIPELINE", "'spellcheck-de")
 pipeline = pipeline.split(",")
 
 model = os.getenv("MODEL")
+prompt = os.getenv("MODEL_PROMPT")
+locale = os.getenv("LOCALE")
 
-__all__ = ["host", "auth_token", "auth_secret", "root_cert", "ssl", "server_config", "pipeline", "model"]
+__all__ = ["host", "auth_token", "auth_secret", "root_cert", "ssl", "server_config", "pipeline", "model", "prompt", "locale"]

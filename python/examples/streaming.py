@@ -3,7 +3,7 @@ import sys
 import wave
 
 from aristech_stt_client import SttClient, RecognitionConfig, RecognitionSpec
-from utils import host, auth_token, auth_secret, root_cert, ssl, model
+from utils import host, auth_token, auth_secret, root_cert, ssl, model, prompt, locale
 
 # Get the repository root
 repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__ + "/..")))
@@ -32,7 +32,9 @@ it = client.recognize(
       sample_rate_hertz=sample_rate_hertz,
       model=model,
       partial_results=True,
-      single_utterance=False
+      single_utterance=False,
+      prompt=prompt,
+      locale=locale,
     )
   ),
   audio_data(),
