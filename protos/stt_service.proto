@@ -289,6 +289,9 @@ message Model {
   // The model id.
   // e.g. generic-model-de-0.21
   string id = 1;
+  // Alias that can also be used to refer to the model instead of the id.
+  // e.g. generic-de or german-large
+  repeated string alias = 12;
   // The human readable model name (for display purposes).
   // e.g. German Generic Model (Large)
   string name = 8;

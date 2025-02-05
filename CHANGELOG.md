@@ -1,5 +1,10 @@
 # Changelog
 
+## NodeJS v1.2.0 - 2025-02-05
+## Rust v2.2.0 - 2025-02-05
+## Python v1.2.0 - 2025-02-05
+- Added support for new alias field.
+
 ## NodeJS v1.1.3 - 2025-02-03
 - Bumped dependencies.
 ## Rust v2.1.5 - 2025-02-03

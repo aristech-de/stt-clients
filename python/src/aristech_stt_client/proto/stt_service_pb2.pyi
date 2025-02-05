@@ -713,6 +713,7 @@ class Model(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     ID_FIELD_NUMBER: builtins.int
+    ALIAS_FIELD_NUMBER: builtins.int
     NAME_FIELD_NUMBER: builtins.int
     DESCRIPTION_FIELD_NUMBER: builtins.int
     VERSION_FIELD_NUMBER: builtins.int
@@ -737,6 +738,12 @@ class Model(google.protobuf.message.Message):
     """The model version."""
     type: global___ModelType.ValueType
     """The model type."""
+    @property
+    def alias(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]:
+        """Alias that can also be used to refer to the model instead of the id.
+        e.g. generic-de or german-large
+        """
+
     @property
     def locale(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]:
         """The locale(s) supported by the model."""
@@ -765,6 +772,7 @@ class Model(google.protobuf.message.Message):
         self,
         *,
         id: builtins.str = ...,
+        alias: collections.abc.Iterable[builtins.str] | None = ...,
         name: builtins.str = ...,
         description: builtins.str = ...,
         version: builtins.str = ...,
@@ -777,7 +785,7 @@ class Model(google.protobuf.message.Message):
         endpointing: collections.abc.Iterable[global___EndpointingType.ValueType] | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["nlp", b"nlp"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["description", b"description", "endpointing", b"endpointing", "examples", b"examples", "grammar_type", b"grammar_type", "id", b"id", "locale", b"locale", "name", b"name", "nlp", b"nlp", "slots", b"slots", "type", b"type", "version", b"version"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["alias", b"alias", "description", b"description", "endpointing", b"endpointing", "examples", b"examples", "grammar_type", b"grammar_type", "id", b"id", "locale", b"locale", "name", b"name", "nlp", b"nlp", "slots", b"slots", "type", b"type", "version", b"version"]) -> None: ...
 
 global___Model = Model
 
