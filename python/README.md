@@ -47,5 +47,5 @@ SECRET=your-secret
 2. Run the examples, e.g.:
 
 ```sh
-python examples/streaming.py
+PYTHONPATH=src python examples/streaming.py
 ```

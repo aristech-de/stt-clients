@@ -77,7 +77,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 specification: Some(RecognitionSpec {
                     audio_encoding: 0,
                     sample_rate_hertz: sample_rate,
-                    locale: std::env::var("LOCALE").unwrap_or_else(|_| "".to_string()), // e.g. "en". Only relevant for multilingual models which autodetect the language if not set.
+                    // e.g. "en". Only relevant for multilingual multitask models which autodetect the language if not set.
+                    locale: std::env::var("LOCALE").unwrap_or_else(|_| "".to_string()),
                     graph: "".to_string(),
                     grammar: "".to_string(),
                     partial_results: true,
@@ -87,6 +88,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     model: std::env::var("MODEL").unwrap_or_else(|_| "".to_string()),
                     endpointing: None,
                     vad: None,
+                    // Can be used for multitask models to add a glossary with task-specific vocabulary (e.g. product names) that would otherwise be unlikely to be recognized. Can also be used to steer the recognition towards a specific writing style.
                     prompt: std::env::var("MODEL_PROMPT").unwrap_or_else(|_| "".to_string()),
                 }),
             },

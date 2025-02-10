@@ -60,15 +60,12 @@ export function endpointingTypeToJSON(object: EndpointingType): string {
 }
 
 export enum ModelType {
-  /** CORE_STT - Core-STT model type. */
+  /** CORE_STT - STT-Core models */
   CORE_STT = 0,
-  /**
-   * GRAMMAR_STT - Grammar-STT model type (these models are used for grammar recognition or
-   * keyword spotting)
-   */
+  /** GRAMMAR_STT - Grammar only models */
   GRAMMAR_STT = 1,
-  /** WHISPER_STT - Whisper-STT model type. */
-  WHISPER_STT = 2,
+  /** MULTITASK_STT - Multitask models */
+  MULTITASK_STT = 2,
   /** DIARIZATION - Speaker diarization model type. */
   DIARIZATION = 3,
   UNRECOGNIZED = -1,
@@ -83,8 +80,8 @@ export function modelTypeFromJSON(object: any): ModelType {
     case "GRAMMAR_STT":
       return ModelType.GRAMMAR_STT;
     case 2:
-    case "WHISPER_STT":
-      return ModelType.WHISPER_STT;
+    case "MULTITASK_STT":
+      return ModelType.MULTITASK_STT;
     case 3:
     case "DIARIZATION":
       return ModelType.DIARIZATION;
@@ -101,8 +98,8 @@ export function modelTypeToJSON(object: ModelType): string {
       return "CORE_STT";
     case ModelType.GRAMMAR_STT:
       return "GRAMMAR_STT";
-    case ModelType.WHISPER_STT:
-      return "WHISPER_STT";
+    case ModelType.MULTITASK_STT:
+      return "MULTITASK_STT";
     case ModelType.DIARIZATION:
       return "DIARIZATION";
     case ModelType.UNRECOGNIZED:
@@ -625,34 +622,6 @@ export interface NLPFunction {
   name: string;
   /** The nlp function description. */
   description: string;
-}
-
-/** The `LocalesRequest` message currently contains no information. */
-export interface LocalesRequest {
-}
-
-/** The `LocalesResponse` message contains the list of supported locales. */
-export interface LocalesResponse {
-  /** List of supported locales. */
-  locale: Locale[];
-}
-
-/** The `Locale` message contains the information about a single locale. */
-export interface Locale {
-  /**
-   * The locale as specified within the model.
-   * e.g. en_US, de_DE, etc.
-   */
-  locale: string;
-  /**
-   * Whether language model adaptations are supported during runtime by
-   * specifying a simple json phrase list as grammar.
-   */
-  dynamic: boolean;
-  /** The models that are available for this locale */
-  model: string[];
-  /** The available custom graphs for this locale */
-  graphs: Graph[];
 }
 
 /** The `Graph` message contains the information about a single graph. */
@@ -2832,217 +2801,6 @@ export const NLPFunction: MessageFns<NLPFunction> = {
   },
 };
 
-function createBaseLocalesRequest(): LocalesRequest {
-  return {};
-}
-
-export const LocalesRequest: MessageFns<LocalesRequest> = {
-  encode(_: LocalesRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): LocalesRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseLocalesRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(_: any): LocalesRequest {
-    return {};
-  },
-
-  toJSON(_: LocalesRequest): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<LocalesRequest>, I>>(base?: I): LocalesRequest {
-    return LocalesRequest.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<LocalesRequest>, I>>(_: I): LocalesRequest {
-    const message = createBaseLocalesRequest();
-    return message;
-  },
-};
-
-function createBaseLocalesResponse(): LocalesResponse {
-  return { locale: [] };
-}
-
-export const LocalesResponse: MessageFns<LocalesResponse> = {
-  encode(message: LocalesResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    for (const v of message.locale) {
-      Locale.encode(v!, writer.uint32(10).fork()).join();
-    }
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): LocalesResponse {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseLocalesResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
-
-          message.locale.push(Locale.decode(reader, reader.uint32()));
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): LocalesResponse {
-    return {
-      locale: globalThis.Array.isArray(object?.locale) ? object.locale.map((e: any) => Locale.fromJSON(e)) : [],
-    };
-  },
-
-  toJSON(message: LocalesResponse): unknown {
-    const obj: any = {};
-    if (message.locale?.length) {
-      obj.locale = message.locale.map((e) => Locale.toJSON(e));
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<LocalesResponse>, I>>(base?: I): LocalesResponse {
-    return LocalesResponse.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<LocalesResponse>, I>>(object: I): LocalesResponse {
-    const message = createBaseLocalesResponse();
-    message.locale = object.locale?.map((e) => Locale.fromPartial(e)) || [];
-    return message;
-  },
-};
-
-function createBaseLocale(): Locale {
-  return { locale: "", dynamic: false, model: [], graphs: [] };
-}
-
-export const Locale: MessageFns<Locale> = {
-  encode(message: Locale, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.locale !== "") {
-      writer.uint32(10).string(message.locale);
-    }
-    if (message.dynamic !== false) {
-      writer.uint32(24).bool(message.dynamic);
-    }
-    for (const v of message.model) {
-      writer.uint32(34).string(v!);
-    }
-    for (const v of message.graphs) {
-      Graph.encode(v!, writer.uint32(42).fork()).join();
-    }
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): Locale {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseLocale();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
-
-          message.locale = reader.string();
-          continue;
-        }
-        case 3: {
-          if (tag !== 24) {
-            break;
-          }
-
-          message.dynamic = reader.bool();
-          continue;
-        }
-        case 4: {
-          if (tag !== 34) {
-            break;
-          }
-
-          message.model.push(reader.string());
-          continue;
-        }
-        case 5: {
-          if (tag !== 42) {
-            break;
-          }
-
-          message.graphs.push(Graph.decode(reader, reader.uint32()));
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): Locale {
-    return {
-      locale: isSet(object.locale) ? globalThis.String(object.locale) : "",
-      dynamic: isSet(object.dynamic) ? globalThis.Boolean(object.dynamic) : false,
-      model: globalThis.Array.isArray(object?.model) ? object.model.map((e: any) => globalThis.String(e)) : [],
-      graphs: globalThis.Array.isArray(object?.graphs) ? object.graphs.map((e: any) => Graph.fromJSON(e)) : [],
-    };
-  },
-
-  toJSON(message: Locale): unknown {
-    const obj: any = {};
-    if (message.locale !== "") {
-      obj.locale = message.locale;
-    }
-    if (message.dynamic !== false) {
-      obj.dynamic = message.dynamic;
-    }
-    if (message.model?.length) {
-      obj.model = message.model;
-    }
-    if (message.graphs?.length) {
-      obj.graphs = message.graphs.map((e) => Graph.toJSON(e));
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<Locale>, I>>(base?: I): Locale {
-    return Locale.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<Locale>, I>>(object: I): Locale {
-    const message = createBaseLocale();
-    message.locale = object.locale ?? "";
-    message.dynamic = object.dynamic ?? false;
-    message.model = object.model?.map((e) => e) || [];
-    message.graphs = object.graphs?.map((e) => Graph.fromPartial(e)) || [];
-    return message;
-  },
-};
-
 function createBaseGraph(): Graph {
   return { name: "" };
 }
@@ -3476,21 +3234,6 @@ export const SttServiceService = {
     responseSerialize: (value: NLPFunctionsResponse) => Buffer.from(NLPFunctionsResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer) => NLPFunctionsResponse.decode(value),
   },
-  /**
-   * List all supported locales.
-   * @deprecated Use Models instead.
-   *
-   * @deprecated
-   */
-  locales: {
-    path: "/ari.stt.v1.SttService/Locales",
-    requestStream: false,
-    responseStream: false,
-    requestSerialize: (value: LocalesRequest) => Buffer.from(LocalesRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer) => LocalesRequest.decode(value),
-    responseSerialize: (value: LocalesResponse) => Buffer.from(LocalesResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer) => LocalesResponse.decode(value),
-  },
   accountInfo: {
     path: "/ari.stt.v1.SttService/AccountInfo",
     requestStream: false,
@@ -3519,13 +3262,6 @@ export interface SttServiceServer extends UntypedServiceImplementation {
   models: handleUnaryCall<ModelsRequest, ModelsResponse>;
   /** List all available nlp server configs and corresponding functions. */
   nlpFunctions: handleUnaryCall<NLPFunctionsRequest, NLPFunctionsResponse>;
-  /**
-   * List all supported locales.
-   * @deprecated Use Models instead.
-   *
-   * @deprecated
-   */
-  locales: handleUnaryCall<LocalesRequest, LocalesResponse>;
   accountInfo: handleUnaryCall<AccountInfoRequest, AccountInfoResponse>;
   /** Processes the given text with the given nlp pipeline. */
   nlpProcess: handleUnaryCall<NLPProcessRequest, NLPProcessResponse>;
@@ -3572,27 +3308,6 @@ export interface SttServiceClient extends Client {
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: NLPFunctionsResponse) => void,
-  ): ClientUnaryCall;
-  /**
-   * List all supported locales.
-   * @deprecated Use Models instead.
-   *
-   * @deprecated
-   */
-  locales(
-    request: LocalesRequest,
-    callback: (error: ServiceError | null, response: LocalesResponse) => void,
-  ): ClientUnaryCall;
-  locales(
-    request: LocalesRequest,
-    metadata: Metadata,
-    callback: (error: ServiceError | null, response: LocalesResponse) => void,
-  ): ClientUnaryCall;
-  locales(
-    request: LocalesRequest,
-    metadata: Metadata,
-    options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: LocalesResponse) => void,
   ): ClientUnaryCall;
   accountInfo(
     request: AccountInfoRequest,

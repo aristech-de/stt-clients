@@ -15,13 +15,6 @@ service SttService {
   // List all available nlp server configs and corresponding functions.
   rpc NLPFunctions(NLPFunctionsRequest) returns (NLPFunctionsResponse) {}
 
-  // List all supported locales.
-  // @deprecated Use Models instead.
-  rpc Locales(LocalesRequest) returns (LocalesResponse) {
-    // Use models instead.
-    option deprecated = true;
-  };
-
   rpc AccountInfo(AccountInfoRequest) returns (AccountInfoResponse) {}
 
   // Processes the given text with the given nlp pipeline.
@@ -323,13 +316,12 @@ enum EndpointingType {
 }
 
 enum ModelType {
-  // Core-STT model type.
+  // STT-Core models
   CORE_STT = 0;
-  // Grammar-STT model type (these models are used for grammar recognition or
-  // keyword spotting)
+  // Grammar only models
   GRAMMAR_STT = 1;
-  // Whisper-STT model type.
-  WHISPER_STT = 2;
+  // Multitask models
+  MULTITASK_STT = 2;
   // Speaker diarization model type.
   DIARIZATION = 3;
 }
@@ -375,31 +367,6 @@ message NLPFunction {
   string name = 2;
   // The nlp function description.
   string description = 3;
-}
-
-// The `LocalesRequest` message currently contains no information.
-message LocalesRequest {}
-
-// The `LocalesResponse` message contains the list of supported locales.
-message LocalesResponse {
-  // List of supported locales.
-  repeated Locale locale = 1;
-}
-
-// The `Locale` message contains the information about a single locale.
-message Locale {
-  reserved 2;
-  reserved "graph_names";
-  // The locale as specified within the model.
-  // e.g. en_US, de_DE, etc.
-  string locale = 1;
-  // Whether language model adaptations are supported during runtime by
-  // specifying a simple json phrase list as grammar.
-  bool dynamic = 3;
-  // The models that are available for this locale
-  repeated string model = 4;
-  // The available custom graphs for this locale
-  repeated Graph graphs = 5;
 }
 
 // The `Graph` message contains the information about a single graph.

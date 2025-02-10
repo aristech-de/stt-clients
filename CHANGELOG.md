@@ -1,5 +1,11 @@
 # Changelog
 
+## NodeJS v2.0.0 - 2025-02-10
+## Rust v3.0.0 - 2025-02-10
+## Python v2.0.0 - 2025-02-10
+- **Breaking:** Removed deprecated `Locales` method. To get the available locales, use the `Models` method instead.
+- **Breaking**: Renamed `ModelType::WHISPER_STT` to `ModelType::MULTITASK_STT`.
+
 ## NodeJS v1.2.0 - 2025-02-05
 ## Rust v2.2.0 - 2025-02-05
 ## Python v1.2.0 - 2025-02-05

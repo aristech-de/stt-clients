@@ -46,26 +46,22 @@ class _ModelType:
 class _ModelTypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_ModelType.ValueType], builtins.type):
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     CORE_STT: _ModelType.ValueType  # 0
-    """Core-STT model type."""
+    """STT-Core models"""
     GRAMMAR_STT: _ModelType.ValueType  # 1
-    """Grammar-STT model type (these models are used for grammar recognition or
-    keyword spotting)
-    """
-    WHISPER_STT: _ModelType.ValueType  # 2
-    """Whisper-STT model type."""
+    """Grammar only models"""
+    MULTITASK_STT: _ModelType.ValueType  # 2
+    """Multitask models"""
     DIARIZATION: _ModelType.ValueType  # 3
     """Speaker diarization model type."""
 
 class ModelType(_ModelType, metaclass=_ModelTypeEnumTypeWrapper): ...
 
 CORE_STT: ModelType.ValueType  # 0
-"""Core-STT model type."""
+"""STT-Core models"""
 GRAMMAR_STT: ModelType.ValueType  # 1
-"""Grammar-STT model type (these models are used for grammar recognition or
-keyword spotting)
-"""
-WHISPER_STT: ModelType.ValueType  # 2
-"""Whisper-STT model type."""
+"""Grammar only models"""
+MULTITASK_STT: ModelType.ValueType  # 2
+"""Multitask models"""
 DIARIZATION: ModelType.ValueType  # 3
 """Speaker diarization model type."""
 global___ModelType = ModelType
@@ -872,76 +868,6 @@ class NLPFunction(google.protobuf.message.Message):
     def ClearField(self, field_name: typing.Literal["description", b"description", "id", b"id", "name", b"name"]) -> None: ...
 
 global___NLPFunction = NLPFunction
-
-@typing.final
-class LocalesRequest(google.protobuf.message.Message):
-    """The `LocalesRequest` message currently contains no information."""
-
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-    def __init__(
-        self,
-    ) -> None: ...
-
-global___LocalesRequest = LocalesRequest
-
-@typing.final
-class LocalesResponse(google.protobuf.message.Message):
-    """The `LocalesResponse` message contains the list of supported locales."""
-
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-    LOCALE_FIELD_NUMBER: builtins.int
-    @property
-    def locale(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___Locale]:
-        """List of supported locales."""
-
-    def __init__(
-        self,
-        *,
-        locale: collections.abc.Iterable[global___Locale] | None = ...,
-    ) -> None: ...
-    def ClearField(self, field_name: typing.Literal["locale", b"locale"]) -> None: ...
-
-global___LocalesResponse = LocalesResponse
-
-@typing.final
-class Locale(google.protobuf.message.Message):
-    """The `Locale` message contains the information about a single locale."""
-
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-    LOCALE_FIELD_NUMBER: builtins.int
-    DYNAMIC_FIELD_NUMBER: builtins.int
-    MODEL_FIELD_NUMBER: builtins.int
-    GRAPHS_FIELD_NUMBER: builtins.int
-    locale: builtins.str
-    """The locale as specified within the model.
-    e.g. en_US, de_DE, etc.
-    """
-    dynamic: builtins.bool
-    """Whether language model adaptations are supported during runtime by
-    specifying a simple json phrase list as grammar.
-    """
-    @property
-    def model(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]:
-        """The models that are available for this locale"""
-
-    @property
-    def graphs(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___Graph]:
-        """The available custom graphs for this locale"""
-
-    def __init__(
-        self,
-        *,
-        locale: builtins.str = ...,
-        dynamic: builtins.bool = ...,
-        model: collections.abc.Iterable[builtins.str] | None = ...,
-        graphs: collections.abc.Iterable[global___Graph] | None = ...,
-    ) -> None: ...
-    def ClearField(self, field_name: typing.Literal["dynamic", b"dynamic", "graphs", b"graphs", "locale", b"locale", "model", b"model"]) -> None: ...
-
-global___Locale = Locale
 
 @typing.final
 class Graph(google.protobuf.message.Message):

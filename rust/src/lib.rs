@@ -18,10 +18,10 @@ use tonic::transport::{Certificate, Channel, ClientTlsConfig};
 
 use stt_service::stt_service_client::SttServiceClient;
 use stt_service::{
-    streaming_recognition_request, AccountInfoRequest, AccountInfoResponse, LocalesRequest,
-    LocalesResponse, ModelsRequest, ModelsResponse, NlpFunctionsRequest, NlpFunctionsResponse,
-    NlpProcessRequest, NlpProcessResponse, RecognitionConfig, RecognitionSpec,
-    StreamingRecognitionRequest, StreamingRecognitionResponse,
+    streaming_recognition_request, AccountInfoRequest, AccountInfoResponse, ModelsRequest,
+    ModelsResponse, NlpFunctionsRequest, NlpFunctionsResponse, NlpProcessRequest,
+    NlpProcessResponse, RecognitionConfig, RecognitionSpec, StreamingRecognitionRequest,
+    StreamingRecognitionResponse,
 };
 
 /// The Auth struct holds the token and secret needed to authenticate with the server.
@@ -170,23 +170,6 @@ pub async fn get_models(
     let req = request.unwrap_or(ModelsRequest::default());
     let request = tonic::Request::new(req);
     let response = client.models(request).await?;
-    Ok(response.get_ref().to_owned())
-}
-
-/// Gets the list of available locales from the server.
-/// This function is deprecated. Please use the get_models instead and check which locales are available for each model.
-#[deprecated(
-    since = "2.0.0",
-    note = "Please use the get_models instead and check which locales are available for each model."
-)]
-pub async fn get_locales(
-    client: &mut SttClient,
-    request: Option<LocalesRequest>,
-) -> Result<LocalesResponse, Box<dyn Error>> {
-    let req = request.unwrap_or(LocalesRequest::default());
-    let request = tonic::Request::new(req);
-    #[allow(deprecated)]
-    let response = client.locales(request).await?;
     Ok(response.get_ref().to_owned())
 }
 

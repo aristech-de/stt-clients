@@ -49,11 +49,6 @@ class SttServiceStub(object):
                 request_serializer=stt__service__pb2.NLPFunctionsRequest.SerializeToString,
                 response_deserializer=stt__service__pb2.NLPFunctionsResponse.FromString,
                 _registered_method=True)
-        self.Locales = channel.unary_unary(
-                '/ari.stt.v1.SttService/Locales',
-                request_serializer=stt__service__pb2.LocalesRequest.SerializeToString,
-                response_deserializer=stt__service__pb2.LocalesResponse.FromString,
-                _registered_method=True)
         self.AccountInfo = channel.unary_unary(
                 '/ari.stt.v1.SttService/AccountInfo',
                 request_serializer=stt__service__pb2.AccountInfoRequest.SerializeToString,
@@ -90,14 +85,6 @@ class SttServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def Locales(self, request, context):
-        """List all supported locales.
-        @deprecated Use Models instead.
-        """
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
     def AccountInfo(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -128,11 +115,6 @@ def add_SttServiceServicer_to_server(servicer, server):
                     servicer.NLPFunctions,
                     request_deserializer=stt__service__pb2.NLPFunctionsRequest.FromString,
                     response_serializer=stt__service__pb2.NLPFunctionsResponse.SerializeToString,
-            ),
-            'Locales': grpc.unary_unary_rpc_method_handler(
-                    servicer.Locales,
-                    request_deserializer=stt__service__pb2.LocalesRequest.FromString,
-                    response_serializer=stt__service__pb2.LocalesResponse.SerializeToString,
             ),
             'AccountInfo': grpc.unary_unary_rpc_method_handler(
                     servicer.AccountInfo,
@@ -226,33 +208,6 @@ class SttService(object):
             '/ari.stt.v1.SttService/NLPFunctions',
             stt__service__pb2.NLPFunctionsRequest.SerializeToString,
             stt__service__pb2.NLPFunctionsResponse.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
-    def Locales(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/ari.stt.v1.SttService/Locales',
-            stt__service__pb2.LocalesRequest.SerializeToString,
-            stt__service__pb2.LocalesResponse.FromString,
             options,
             channel_credentials,
             insecure,
