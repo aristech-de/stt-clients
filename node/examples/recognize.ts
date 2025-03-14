@@ -24,5 +24,5 @@ const client = new SttClient({
   rootCert: process.env.ROOT_CERT,
   auth,
 })
-const results = await client.recognizeFile(fileName)
+const results = await client.recognizeFile(fileName, { specification: { model: process.env.MODEL } })
 console.log(results.map(r => r.chunks[0].alternatives[0].text).join('\n'))
