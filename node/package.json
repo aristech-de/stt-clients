@@ -1,6 +1,6 @@
 {
   "name": "@aristech-org/stt-client",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "A Node.js client library for the Aristech Speech-to-Text API",
   "type": "module",
   "types": "dist/index.d.ts",
@@ -38,10 +38,10 @@
   },
   "homepage": "https://github.com/aristech-de/stt-clients/blob/main/node/README.md",
   "devDependencies": {
-    "@types/node": "22.13.10",
+    "@types/node": "22.13.14",
     "dotenv": "16.4.7",
-    "simple-git-hooks": "^2.11.1",
-    "ts-proto": "2.6.1",
+    "simple-git-hooks": "2.12.1",
+    "ts-proto": "2.7.0",
     "tsx": "4.19.3",
     "typescript": "5.8.2"
   },
@@ -49,8 +49,8 @@
     "dist"
   ],
   "dependencies": {
-    "@bufbuild/protobuf": "2.2.3",
-    "@grpc/grpc-js": "1.13.0"
+    "@bufbuild/protobuf": "2.2.5",
+    "@grpc/grpc-js": "1.13.2"
   },
   "exports": {
     ".": "./dist/index.js"

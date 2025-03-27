@@ -1,13 +1,15 @@
-import os
 import sys
-
+import os
 from aristech_stt_client import SttClient, RecognitionConfig, RecognitionSpec
-from utils import host, auth_token, auth_secret, root_cert, ssl, model
+from dotenv import load_dotenv
+
+load_dotenv()
+model = os.getenv("MODEL")
 
 # Get the repository root
 repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__ + "/..")))
 
-client = SttClient(host=host, ssl=ssl, root_cert=root_cert, auth_token=auth_token, auth_secret=auth_secret)
+client = SttClient()
 
 # Load test.wav from the repository root or the first argument
 # We do not have to specify the sample rate here because this is figured out by the client when using the recognize_file method

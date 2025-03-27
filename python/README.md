@@ -13,7 +13,9 @@ pip install aristech-stt-client
 ```python
 from aristech_stt_client import SttClient, RecognitionConfig, RecognitionSpec
 
-client = SttClient(host='stt.example.com')
+client = SttClient(
+  api_key=os.getenv('ARISTECH_STT_API_KEY', ''), # This is the default and can be omitted
+)
 results = client.recognize_file("path/to/audio/file.wav", RecognitionConfig(specification=RecognitionSpec(model="some-model")))
 print('\n'.join([r.chunks[0].alternatives[0].text for r in results]))
 ```
@@ -27,25 +29,24 @@ There are several examples in the [examples](https://github.com/aristech-de/stt-
 - [nlpProcess.py](https://github.com/aristech-de/stt-clients/blob/main/python/examples/nlpProcess.py): Demonstrates how to perform NLP processing on a text by using the STT-Server as a proxy.
 - [account.py](https://github.com/aristech-de/stt-clients/blob/main/python/examples/account.py): Demonstrates how to retrieve the account information from the server.
 
-You can run the examples directly using `python` like this:
-
-1. Create a `.env` file in the [python](.) directory:
-
-```sh
-HOST=stt.example.com
-# The credentials are optional but probably required for most servers:
-TOKEN=your-token
-SECRET=your-secret
-
-# The following are optional:
-# ROOT_CERT=your-root-cert.pem # If the server uses a self-signed certificate
-# MODEL=some-available-model
-# NLP_SERVER=some-config
-# NLP_PIPELINE=function1,function2
-```
-
-2. Run the examples, e.g.:
+To run the examples while using the local version of the package, run the package with the `PYTHONPATH` environment variable set to the src directory:
 
 ```sh
 PYTHONPATH=src python examples/streaming.py
 ```
+
+### API Key
+
+If you didn't get an API key but a token, secret and host instead, you can simply convert those values with our [API key generator](https://www.aristech.de/api-key-generator/?type=stt).
+
+<details>
+
+<summary>Alternatively you can still provide the connection options manually.</summary>
+
+```python
+from aristech_stt_client import SttClient
+
+client = SttClient(host='stt.example.com:443', auth_token='your-token', auth_secret='your-secret')
+```
+
+</details>

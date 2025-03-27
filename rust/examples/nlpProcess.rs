@@ -1,10 +1,9 @@
-mod utils;
 use std::error::Error;
-use utils::get_tls_options;
 
 use aristech_stt_client::{
-    get_client, nlp_process,
+    nlp_process,
     stt_service::{NlpFunctionSpec, NlpProcessRequest, NlpSpec},
+    SttClientBuilder,
 };
 
 #[tokio::main]
@@ -12,9 +11,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // Load environment variables from .env file
     dotenv::dotenv()?;
 
-    let host = std::env::var("HOST")?;
-    let tls_options = get_tls_options()?;
-    let mut client = get_client(host, tls_options).await?;
+    let mut client = SttClientBuilder::new().build().await?;
 
     let server_config = std::env::var("NLP_SERVER_CONFIG").unwrap_or("default".to_string());
     let functions = std::env::var("NLP_PIPELINE").unwrap_or("spellcheck-de".to_string());

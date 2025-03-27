@@ -51,13 +51,68 @@ export interface ConnectionOptions {
     token: string
     secret: string
   }
+  /**
+   * Instead of providing an auth token and secret, an API key can be used.
+   * The key might also encode information such as the host to connect to.
+   */
+  apiKey?: string
+}
+
+interface ApiKeyData {
+  token: string
+  secret: string
+  host?: string
+}
+
+const decodeApiKey = (apiKey = ''): ApiKeyData | null => {
+  if (!apiKey) {
+    return null
+  }
+  // API keys must start with `at-`
+  if (!apiKey.startsWith('at-')) {
+    throw new Error('Invalid API key')
+  }
+  // Remove the `at-` prefix
+  const base64Key = apiKey.slice(3)
+  // Decode the base64 url encoded key
+  // Replace URL-safe characters
+  let base64 = base64Key.replace(/-/g, '+').replace(/_/g, '/')
+  // Pad with '=' to make length a multiple of 4
+  while (base64.length % 4 !== 0) {
+    base64 += '='
+  }
+  const data = Buffer.from(base64, 'base64').toString('utf8')
+  // The data is yaml encoded but not nested so we can just split it
+  const parts = data.split('\n')
+  let token = ''
+  let secret = ''
+  let host: string | undefined
+  for (const part of parts) {
+    const result = part.match(/^(?<key>[^:]+)\W*\:\W*(?<value>.*)$/)
+    if (!result) {
+      continue
+    }
+    const { key = '', value = '' } = result.groups || { key: '', value: '' }
+    if (key === 'token') {
+      token = value.trim()
+    } else if (key === 'secret') {
+      secret = value.trim()
+    } else if (key === 'host') {
+      host = value.trim()
+    } else if (key === 'type') {
+      if (value.trim() !== 'stt') {
+        throw new Error('The provided API key is not for the Aristech STT service but for ' + value.toUpperCase())
+      }
+    }
+  }
+  return { token, secret, host }
 }
 
 export class SttClient {
   private cOptions: ConnectionOptions
 
-  constructor(options: ConnectionOptions) {
-    this.cOptions = options
+  constructor(options?: ConnectionOptions) {
+    this.cOptions = options || {}
   }
 
   /**
@@ -194,8 +249,17 @@ export class SttClient {
   }
 
   private getClient() {
-    const { rootCert: rootCertPath, rootCertContent, auth, grpcClientOptions } = this.cOptions
-    let host = this.cOptions.host || 'localhost:9423'
+    const {
+      rootCert: rootCertPath = process.env['ARISTECH_STT_CA_CERTIFICATE'],
+      rootCertContent,
+      auth,
+      apiKey = process.env['ARISTECH_STT_API_KEY'],
+      grpcClientOptions,
+    } = this.cOptions
+    const keyData = decodeApiKey(apiKey)
+    let host = this.cOptions.host || keyData?.host || 'localhost:9423'
+
+    
     let ssl = this.cOptions.ssl === true
     let rootCert: Buffer | null = null
     if (rootCertContent) {
@@ -203,14 +267,31 @@ export class SttClient {
     } else if (rootCertPath) {
       rootCert = fs.readFileSync(rootCertPath)
     }
+    
+    // An API key indicates that we have to use encryption
+    if (keyData) {
+      const creds = grpc.credentials.createSsl(rootCert)
+      const callCreds = grpc.credentials.createFromMetadataGenerator(
+        (_, cb) => {
+          const meta = new grpc.Metadata()
+          // Newer server versions also support directly providing the API key as authortization metadata instead of token and secret
+          meta.add('token', keyData.token)
+          meta.add('secret', keyData.secret)
+          cb(null, meta)
+        },
+      )
+      const credsWithKey = grpc.credentials.combineChannelCredentials(creds, callCreds)
+      return new SttServiceClient(host, credsWithKey, grpcClientOptions)
+    }
+
     const sslExplicit = typeof this.cOptions.ssl === 'boolean' || !!rootCert
     const portRe = /[^:]+:([0-9]+)$/
     if (portRe.test(host)) {
-      // In case a port was provided but ssl was not specified
-      // ssl is assumed when the port matches 9424
-      const [, portStr] = host.match(portRe)!
-      const hostPort = parseInt(portStr, 10)
       if (!sslExplicit) {
+        // In case a port was provided but ssl was not specified
+        // ssl is assumed when the port matches 9424
+        const [, portStr] = host.match(portRe)!
+        const hostPort = parseInt(portStr, 10)
         if (hostPort === 9424) {
           ssl = true
         } else {
@@ -228,7 +309,7 @@ export class SttClient {
     }
 
     let creds = grpc.credentials.createInsecure()
-    if (ssl || rootCert) {
+    if (ssl || rootCert || keyData) {
       creds = grpc.credentials.createSsl(rootCert)
       if (auth) {
         const callCreds = grpc.credentials.createFromMetadataGenerator(

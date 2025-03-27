@@ -16,13 +16,6 @@ if (!fileName) {
   process.exit(1)
 }
 
-const auth = process.env.TOKEN && process.env.SECRET ? { token: process.env.TOKEN, secret: process.env.SECRET } : undefined
-
-const client = new SttClient({
-  host: process.env.HOST,
-  ssl: Boolean(auth) || Boolean(process.env.ROOT_CERT) || process.env.SSL === 'true',
-  rootCert: process.env.ROOT_CERT,
-  auth,
-})
+const client = new SttClient()
 const results = await client.recognizeFile(fileName, { specification: { model: process.env.MODEL } })
 console.log(results.map(r => r.chunks[0].alternatives[0].text).join('\n'))

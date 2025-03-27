@@ -1,23 +1,20 @@
 // Usage: cargo run --example file [<path_to_wav_file>]
-mod utils;
-
 use std::error::Error;
 
 use aristech_stt_client::{
-    get_client, recognize_file,
+    recognize_file,
     stt_service::{RecognitionConfig, RecognitionSpec},
+    SttClientBuilder,
 };
 use tonic::codegen::CompressionEncoding;
-use utils::get_tls_options;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     // Load environment variables from .env file
     dotenv::dotenv()?;
 
-    let host = std::env::var("HOST")?;
-    let tls_options = get_tls_options()?;
-    let mut client = get_client(host, tls_options)
+    let mut client = SttClientBuilder::new()
+        .build()
         .await?
         .accept_compressed(CompressionEncoding::Gzip)
         .send_compressed(CompressionEncoding::Gzip);

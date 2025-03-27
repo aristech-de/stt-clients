@@ -13,18 +13,22 @@ cargo add aristech-stt-client
 ## Usage
 
 ```rust
-use aristech_stt_client::{get_client, recognize_file, TlsOptions, Auth};
+use aristech_stt_client::{SttClientBuilder, recognize_file};
 use std::error::Error;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let mut client = get_client(
-    "https://stt.example.com",
-    Some(TlsOptions {
-        ca_certificate: None,
-        auth: Some(Auth { token: "your-token", secret: "your-secret" }),
-    }),
-    ).await?;
+    // Creating a client like this will attempt to parse the API key from the environment variable `ARISTECH_STT_API_KEY`
+    // but won't fail if it is not present or invalid.
+    let mut client = SttClientBuilder::new()
+        .build()
+        .await?;
+
+    // To manually specify the API key and catch invalid API keys, use the default builder and the `api_key` method.
+    // let mut client = SttClientBuilder::default() // <- won't attempt to parse the API key from the environment variable
+    //     .api_key("at-abc123...")?
+    //     .build()
+    //     .await?;
 
     let results = recognize_file(&mut client, "path/to/audio/file.wav", None).await?;
     for result in results {
@@ -53,30 +57,32 @@ There are several examples in the [examples](https://github.com/aristech-de/stt-
 - [nlpProcess.rs](https://github.com/aristech-de/stt-clients/blob/main/rust/examples/nlpProcess.rs): Demonstrates how to perform NLP processing on a text by using the STT-Server as a proxy.
 - [account.rs](https://github.com/aristech-de/stt-clients/blob/main/rust/examples/account.rs): Demonstrates how to retrieve the account information from the server.
 
-You can run the examples directly using `cargo` like this:
 
-1. Create a `.env` file in the [rust](.) directory:
-
-```sh
-HOST=stt.example.com
-# The credentials are optional but probably required for most servers:
-TOKEN=your-token
-SECRET=your-secret
-
-# The following are optional:
-# ROOT_CERT=your-root-cert.pem # If the server uses a self-signed certificate
-# If neither credentials nor an explicit root certificate are provided,
-# you can still enable SSL by setting the SSL environment variable to true:
-# SSL=true
-# MODEL=some-available-model
-# NLP_SERVER=some-config
-# NLP_PIPELINE=function1,function2
-```
-
-2. Run the examples, e.g.:
+To run the examples, use `cargo`. For example:
 
 ```sh
 cargo run --example live
+```
+
+### API Key
+
+If you didn't get an API key but a token, secret and host instead, you can simply convert those values with our [API key generator](https://www.aristech.de/api-key-generator/?type=stt).
+
+<details>
+
+<summary>Alternatively you can still provide the connection options manually.</summary>
+
+```rust
+use aristech_stt_client::{SttClientBuilder, Auth};
+
+let mut client = SttClientBuilder::default()
+    .host("https://stt.example.com:443")?
+    .auth(Some(Auth {
+        token: "your-token".to_string(),
+        secret: "your-secret".to_string(),
+    }))
+    .build()
+    .await?;
 ```
 
 ## Build

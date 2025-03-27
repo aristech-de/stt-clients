@@ -1,5 +1,16 @@
 # Changelog
 
+## NodeJS v2.1.0 - 2025-03-14
+- The client constructor options are optional now.
+- Added support for specifying an API key when creating the client.
+- Bumped dependencies.
+## Rust v3.1.0 - 2025-03-14
+- Added SttClientBuilder to Rust client which also allows specifying an API key.
+- Bumped dependencies.
+## Python v2.1.0 - 2025-03-14
+- Added support for specifying an API key when creating the client.
+- Made dependencies and optional dependencies more specific by pinning compatible versions.
+
 ## NodeJS v2.0.1 - 2025-03-14
 ## Rust v3.0.1 - 2025-03-14
 - Bumped dependencies.

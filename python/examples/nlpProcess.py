@@ -1,7 +1,13 @@
+import os
 from aristech_stt_client import SttClient, NLPProcessRequest, NLPSpec, NLPFunctionSpec
-from utils import host, auth_token, auth_secret, root_cert, ssl, server_config, pipeline
+from dotenv import load_dotenv
 
-client = SttClient(host=host, ssl=ssl, root_cert=root_cert, auth_token=auth_token, auth_secret=auth_secret)
+load_dotenv()
+server_config = os.getenv("NLP_SERVER_CONFIG", "default")
+pipeline = os.getenv("NLP_PIPELINE", "'spellcheck-de")
+pipeline = pipeline.split(",")
+
+client = SttClient()
 
 text = "thanks for choosing aristech"
 response = client.nlp_process(NLPProcessRequest(

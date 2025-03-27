@@ -3,12 +3,17 @@ import sys
 import wave
 
 from aristech_stt_client import SttClient, RecognitionConfig, RecognitionSpec
-from utils import host, auth_token, auth_secret, root_cert, ssl, model, prompt, locale
+from dotenv import load_dotenv
+
+load_dotenv()
+model = os.getenv("MODEL")
+prompt = os.getenv("MODEL_PROMPT")
+locale = os.getenv("LOCALE")
 
 # Get the repository root
 repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__ + "/..")))
 
-client = SttClient(host=host, ssl=ssl, root_cert=root_cert, auth_token=auth_token, auth_secret=auth_secret)
+client = SttClient()
 
 # Load test.wav from the repository root or the first argument
 file_path = sys.argv[1] if len(sys.argv) > 1 else os.path.join(repo_root, "test.wav")

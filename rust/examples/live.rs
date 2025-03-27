@@ -1,12 +1,9 @@
-mod utils;
-use utils::get_tls_options;
-
 use aristech_stt_client::{
-    get_client,
     stt_service::{
         streaming_recognition_request, RecognitionConfig, RecognitionSpec,
         StreamingRecognitionRequest,
     },
+    SttClientBuilder,
 };
 
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
@@ -120,9 +117,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Start the stream
     stream.play().unwrap();
 
-    let host = std::env::var("HOST")?;
-    let tls_options = get_tls_options()?;
-    let mut client = get_client(host, tls_options)
+    let mut client = SttClientBuilder::new()
+        .build()
         .await?
         .accept_compressed(CompressionEncoding::Gzip)
         .send_compressed(CompressionEncoding::Gzip);
