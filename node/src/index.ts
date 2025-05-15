@@ -56,6 +56,11 @@ export interface ConnectionOptions {
    * The key might also encode information such as the host to connect to.
    */
   apiKey?: string
+  /**
+   * The available models for the given credentials might be cached for performance reasons.
+   * To explicitly disable this, set this to true.
+   */
+  disableModelCaching?: boolean
 }
 
 interface ApiKeyData {
@@ -255,10 +260,10 @@ export class SttClient {
       auth,
       apiKey = process.env['ARISTECH_STT_API_KEY'],
       grpcClientOptions,
+      disableModelCaching = false,
     } = this.cOptions
     const keyData = decodeApiKey(apiKey)
     let host = this.cOptions.host || keyData?.host || 'localhost:9423'
-
     
     let ssl = this.cOptions.ssl === true
     let rootCert: Buffer | null = null
@@ -277,6 +282,9 @@ export class SttClient {
           // Newer server versions also support directly providing the API key as authortization metadata instead of token and secret
           meta.add('token', keyData.token)
           meta.add('secret', keyData.secret)
+          if (disableModelCaching) {
+            meta.add('cache', 'false')
+          }
           cb(null, meta)
         },
       )
