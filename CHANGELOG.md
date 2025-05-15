@@ -1,5 +1,8 @@
 # Changelog
 
+## NodeJS v2.2.0 - 2025-05-15
+- Bumped dependencies.
+- Allowing to disable model caching explicitly.
 ## Rust v3.1.1 - 2025-05-15
 - Bumped dependencies.
 
