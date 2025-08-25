@@ -11,7 +11,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let response = get_models(&mut client, None).await?;
     for model in response.model {
-        println!("{:?}", model);
+        println!("{:#?}", model);
     }
     Ok(())
 }

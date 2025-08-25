@@ -60,9 +60,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = stream_config.into();
 
     println!(
-        "Using input device \"{}\" @ {} Hz",
+        "Using input device \"{}\" @ {} Hz with configuration: {:?}",
         device.name().unwrap(),
-        sample_rate
+        sample_rate,
+        config
     );
 
     // We create a channel which can be used to create a input_stream of SpeechRecognitionRequests
