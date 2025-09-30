@@ -635,9 +635,8 @@ pub async fn recognize_file(
     let initial_request = StreamingRecognitionRequest {
         streaming_request: Some(StreamingRequest::Config(RecognitionConfig {
             specification: Some(RecognitionSpec {
-                sample_rate_hertz,        // Set sample_rate_hertz from the WAV file
-                partial_results: false,   // We don't want partial results for files
-                locale: "en".to_string(), // Set locale to English
+                sample_rate_hertz,      // Set sample_rate_hertz from the WAV file
+                partial_results: false, // We don't want partial results for files
                 ..spec
             }),
             // At the moment there is nothing besides the specification in the config so we can use the default

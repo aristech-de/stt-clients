@@ -1,5 +1,9 @@
 # Changelog
 
+## Rust v3.1.3 - 2025-09-30
+- Bumped dependencies.
+- Removed the explicit locale in the recognizeFile method to allow language auto-detection for multilingual multitask models.
+
 ## NodeJS v2.2.2 - 2025-09-30
 - Bumped dependencies.
 - Added comment about locale defaults to recognize example and the recognizeFile method.

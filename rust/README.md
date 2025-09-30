@@ -18,15 +18,15 @@ use std::error::Error;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    // Creating a client like this will attempt to parse the API key from the environment variable `ARISTECH_STT_API_KEY`
-    // but won't fail if it is not present or invalid.
+    // Creating a client like this will attempt to parse the API key from the environment variable `ARISTECH_STT_API_KEY`.
+    // If the environment variable is not set or invalid, it will fall back to default values.
     let mut client = SttClientBuilder::new()
         .build()
         .await?;
 
     // To manually specify the API key and catch invalid API keys, use the default builder and the `api_key` method.
     // let mut client = SttClientBuilder::default() // <- won't attempt to parse the API key from the environment variable
-    //     .api_key("at-abc123...")?
+    //     .api_key("at-abc123...")? // <- will return an error if the API key is invalid
     //     .build()
     //     .await?;
 
