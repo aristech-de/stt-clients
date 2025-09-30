@@ -17,5 +17,10 @@ if (!fileName) {
 }
 
 const client = new SttClient()
-const results = await client.recognizeFile(fileName, { specification: { model: process.env.MODEL } })
+const results = await client.recognizeFile(fileName, {
+  specification: {
+    model: process.env.MODEL,
+    locale: '', // Set this to an empty string to enable language auto-detection for multilingual multitask models, otherwise this defaults to 'en'
+  }
+})
 console.log(results.map(r => r.chunks[0].alternatives[0].text).join('\n'))

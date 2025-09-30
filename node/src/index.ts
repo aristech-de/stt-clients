@@ -154,6 +154,10 @@ export class SttClient {
   /**
    * Recognizes a wave file.
    * This is a convenience method to very easily recognize a wave file.
+   * 
+   * **Note:** When no locale is provided, it defaults to 'en' so that the server can determine which model to use when not explicitly providing a model.
+   * If you want to use language auto-detection for multilingual multitask models, you have to explicitly set the locale to an empty string ''.
+   * 
    * @param waveFilePath Path to the wave file.
    * @param config The recognition configuration. The sample rate is automatically determined from the wave file. If you don't provide a config, only the locale will be set to 'en' so that the server can determine which model to use. We usually recomment to provide a specific model however.
    * @returns The recognition response.
@@ -171,9 +175,12 @@ export class SttClient {
           sampleRateHertz: sampleRate,
           partialResults: false,
         }
-    } })
+      }
+    })
     call.write(request)
     const stream = fs.createReadStream(waveFilePath)
+    // Skip the 44 byte wave header
+    stream.read(44)
     stream.on('data', (chunk: Buffer) => {
       const audioContent = Uint8Array.from(chunk)
       const request = StreamingRecognitionRequest.create({ audioContent })

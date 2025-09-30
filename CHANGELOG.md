@@ -1,5 +1,10 @@
 # Changelog
 
+## NodeJS v2.2.2 - 2025-09-30
+- Bumped dependencies.
+- Added comment about locale defaults to recognize example and the recognizeFile method.
+- Explizitly removing the first 44 bytes in the recognizeFile method to avoid recognizing the wave header as audio data.
+
 ## NodeJS v2.2.1 - 2025-08-25
 - Bumped dependencies.
 ## Rust v3.1.2 - 2025-08-25
