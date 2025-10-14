@@ -1,5 +1,8 @@
 # Changelog
 
+## Rust v3.2.0 - 2025-10-14
+- Bumped dependencies.
+- Updated proto file to support new model types and performance metrics.
 ## NodeJS v2.3.0 - 2025-10-14
 - Bumped dependencies.
 - Updated proto file to support new model types and performance metrics.
