@@ -14,6 +14,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
     dotenv::dotenv()?;
 
     let mut client = SttClientBuilder::new()
+        .ca_certificate(
+            std::env::var("ROOT_CERT")
+                .map(|path| std::fs::read_to_string(path))?
+                .ok(),
+        )
         .build()
         .await?
         .accept_compressed(CompressionEncoding::Gzip)
@@ -57,6 +62,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
         }),
     )
     .await?;
+
+    println!("Result {:?}", results);
 
     for result in results {
         println!(

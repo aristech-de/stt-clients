@@ -1,5 +1,9 @@
 # Changelog
 
+## NodeJS v2.3.0 - 2025-10-14
+- Bumped dependencies.
+- Updated proto file to support new model types and performance metrics.
+
 ## Rust v3.1.3 - 2025-09-30
 - Bumped dependencies.
 - Removed the explicit locale in the recognizeFile method to allow language auto-detection for multilingual multitask models.

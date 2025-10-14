@@ -44,8 +44,24 @@ message StreamingRecognitionResponse {
   // different client requests. Be aware that this id should only be used for
   // debugging purposes because it is not collision safe.
   string client_id = 3;
-  // The language identified by the server, e.g. en, de, etc.
+  // The language identified by the model in ISO 639-1
+  // While stt-core models don't set this value, multitask models will set this value based on the detected language
+  // and multitask 2 won't specify the detected language which is why the language is detected from the text if possible (might be incorrect especially for short texts).
   string language = 4;
+  // Performance metrics for the current chunk.
+  message PerformanceMetric {
+    oneof kind {
+      double number = 1;                     // factors, ratios, counts
+      google.protobuf.Duration duration = 2; // timings
+    }
+  }
+  // Performance metrics for the current chunks.
+  // Here are some common metrics that might be included:
+  // - decoding: Time taken for decoding.
+  // - vad: Time taken for voice activity detection.
+  // - nlp: Time taken for NLP post-processing.
+  // - x_realtime: Audio duration of the current chunk divided by the total processing time (real-time factor).
+  map<string, PerformanceMetric> metrics = 5;
 }
 
 // The `RecognitionConfig` message provides information to the recognizer that
@@ -192,6 +208,9 @@ message VadSpec {
   // The minimum duration of speech in seconds before trying to perform a
   // partial recognition.
   float min_speech = 3;
+  // After how many seconds of audio to trigger and endpoint regardless
+  // of anything else.
+  float utterance_timeout = 4;
 }
 
 // The `SpeechRecognitionChunk` message contains the result of a single
@@ -233,15 +252,16 @@ message SpeechRecognitionAlternative {
 message WordInfo {
   reserved 6, 8;
   reserved "raw_word", "entity_label";
-  // The word's start time, in seconds.
+  // The word's start time.
   google.protobuf.Duration start_time = 1;
-  // The word's end time, in seconds.
+  // The word's end time.
   google.protobuf.Duration end_time = 2;
   // The word.
   string word = 3;
   // The confidence of the word in the range [0.0, 1.0].
   float confidence = 4;
-  // Phoneme infos.
+  // Phoneme or token level infos (depending on the model).
+  // Not all models support this field.
   repeated PhoneInfo phones = 5;
   // Speech recognition slot the word belongs to.
   // For nested slots, the slots are joined with a dot and ordered from outer to
@@ -258,14 +278,17 @@ message WordInfo {
   string slot = 7;
 }
 
-// The `PhoneInfo` message contains the phoneme level information.
+// The `PhoneInfo` message contains the phoneme or token-level information.
+// For STT-Core models, this contains phonemes, for multitask models the phones represent tokens.
 message PhoneInfo {
-  // The phone's start time, in seconds.
+  // The phone's start time.
   google.protobuf.Duration start_time = 1;
-  // The phone's end time, in seconds.
+  // The phone's end time.
   google.protobuf.Duration end_time = 2;
   // The phone.
   string phone = 3;
+  // The confidence of the phone in the range [0.0, 1.0].
+  float confidence = 4;
 }
 
 // The `ModelsRequest` message currently contains no information.
@@ -322,6 +345,8 @@ enum ModelType {
   GRAMMAR_STT = 1;
   // Multitask models
   MULTITASK_STT = 2;
+  // Audio-capable multimodal LLMs
+  AUDIO_LLM = 4;
   // Speaker diarization model type.
   DIARIZATION = 3;
 }
