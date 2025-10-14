@@ -51,6 +51,8 @@ class _ModelTypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._Enum
     """Grammar only models"""
     MULTITASK_STT: _ModelType.ValueType  # 2
     """Multitask models"""
+    AUDIO_LLM: _ModelType.ValueType  # 4
+    """Audio-capable multimodal LLMs"""
     DIARIZATION: _ModelType.ValueType  # 3
     """Speaker diarization model type."""
 
@@ -62,6 +64,8 @@ GRAMMAR_STT: ModelType.ValueType  # 1
 """Grammar only models"""
 MULTITASK_STT: ModelType.ValueType  # 2
 """Multitask models"""
+AUDIO_LLM: ModelType.ValueType  # 4
+"""Audio-capable multimodal LLMs"""
 DIARIZATION: ModelType.ValueType  # 3
 """Speaker diarization model type."""
 global___ModelType = ModelType
@@ -143,19 +147,75 @@ class StreamingRecognitionResponse(google.protobuf.message.Message):
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
+    @typing.final
+    class PerformanceMetric(google.protobuf.message.Message):
+        """Performance metrics for the current chunk."""
+
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        NUMBER_FIELD_NUMBER: builtins.int
+        DURATION_FIELD_NUMBER: builtins.int
+        number: builtins.float
+        """factors, ratios, counts"""
+        @property
+        def duration(self) -> google.protobuf.duration_pb2.Duration:
+            """timings"""
+
+        def __init__(
+            self,
+            *,
+            number: builtins.float = ...,
+            duration: google.protobuf.duration_pb2.Duration | None = ...,
+        ) -> None: ...
+        def HasField(self, field_name: typing.Literal["duration", b"duration", "kind", b"kind", "number", b"number"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing.Literal["duration", b"duration", "kind", b"kind", "number", b"number"]) -> None: ...
+        def WhichOneof(self, oneof_group: typing.Literal["kind", b"kind"]) -> typing.Literal["number", "duration"] | None: ...
+
+    @typing.final
+    class MetricsEntry(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        KEY_FIELD_NUMBER: builtins.int
+        VALUE_FIELD_NUMBER: builtins.int
+        key: builtins.str
+        @property
+        def value(self) -> global___StreamingRecognitionResponse.PerformanceMetric: ...
+        def __init__(
+            self,
+            *,
+            key: builtins.str = ...,
+            value: global___StreamingRecognitionResponse.PerformanceMetric | None = ...,
+        ) -> None: ...
+        def HasField(self, field_name: typing.Literal["value", b"value"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> None: ...
+
     CHUNKS_FIELD_NUMBER: builtins.int
     CLIENT_ID_FIELD_NUMBER: builtins.int
     LANGUAGE_FIELD_NUMBER: builtins.int
+    METRICS_FIELD_NUMBER: builtins.int
     client_id: builtins.str
     """A short id that is used in the stt-server logs to differentiate between
     different client requests. Be aware that this id should only be used for
     debugging purposes because it is not collision safe.
     """
     language: builtins.str
-    """The language identified by the server, e.g. en, de, etc."""
+    """The language identified by the model in ISO 639-1
+    While stt-core models don't set this value, multitask models will set this value based on the detected language
+    and multitask 2 won't specify the detected language which is why the language is detected from the text if possible (might be incorrect especially for short texts).
+    """
     @property
     def chunks(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___SpeechRecognitionChunk]:
         """List of results that are currently available."""
+
+    @property
+    def metrics(self) -> google.protobuf.internal.containers.MessageMap[builtins.str, global___StreamingRecognitionResponse.PerformanceMetric]:
+        """Performance metrics for the current chunks.
+        Here are some common metrics that might be included:
+        - decoding: Time taken for decoding.
+        - vad: Time taken for voice activity detection.
+        - nlp: Time taken for NLP post-processing.
+        - x_realtime: Audio duration of the current chunk divided by the total processing time (real-time factor).
+        """
 
     def __init__(
         self,
@@ -163,8 +223,9 @@ class StreamingRecognitionResponse(google.protobuf.message.Message):
         chunks: collections.abc.Iterable[global___SpeechRecognitionChunk] | None = ...,
         client_id: builtins.str = ...,
         language: builtins.str = ...,
+        metrics: collections.abc.Mapping[builtins.str, global___StreamingRecognitionResponse.PerformanceMetric] | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing.Literal["chunks", b"chunks", "client_id", b"client_id", "language", b"language"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["chunks", b"chunks", "client_id", b"client_id", "language", b"language", "metrics", b"metrics"]) -> None: ...
 
 global___StreamingRecognitionResponse = StreamingRecognitionResponse
 
@@ -479,6 +540,7 @@ class VadSpec(google.protobuf.message.Message):
     THRESHOLD_FIELD_NUMBER: builtins.int
     TRAILING_SILENCE_FIELD_NUMBER: builtins.int
     MIN_SPEECH_FIELD_NUMBER: builtins.int
+    UTTERANCE_TIMEOUT_FIELD_NUMBER: builtins.int
     threshold: builtins.float
     """The threshold between 0 and 1.0 to determine if a frame is speech or
     non-speech. A higher threshold will result in less false positives but also
@@ -492,14 +554,19 @@ class VadSpec(google.protobuf.message.Message):
     """The minimum duration of speech in seconds before trying to perform a
     partial recognition.
     """
+    utterance_timeout: builtins.float
+    """After how many seconds of audio to trigger and endpoint regardless
+    of anything else.
+    """
     def __init__(
         self,
         *,
         threshold: builtins.float = ...,
         trailing_silence: builtins.float = ...,
         min_speech: builtins.float = ...,
+        utterance_timeout: builtins.float = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing.Literal["min_speech", b"min_speech", "threshold", b"threshold", "trailing_silence", b"trailing_silence"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["min_speech", b"min_speech", "threshold", b"threshold", "trailing_silence", b"trailing_silence", "utterance_timeout", b"utterance_timeout"]) -> None: ...
 
 global___VadSpec = VadSpec
 
@@ -614,15 +681,17 @@ class WordInfo(google.protobuf.message.Message):
     """
     @property
     def start_time(self) -> google.protobuf.duration_pb2.Duration:
-        """The word's start time, in seconds."""
+        """The word's start time."""
 
     @property
     def end_time(self) -> google.protobuf.duration_pb2.Duration:
-        """The word's end time, in seconds."""
+        """The word's end time."""
 
     @property
     def phones(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___PhoneInfo]:
-        """Phoneme infos."""
+        """Phoneme or token level infos (depending on the model).
+        Not all models support this field.
+        """
 
     def __init__(
         self,
@@ -641,22 +710,27 @@ global___WordInfo = WordInfo
 
 @typing.final
 class PhoneInfo(google.protobuf.message.Message):
-    """The `PhoneInfo` message contains the phoneme level information."""
+    """The `PhoneInfo` message contains the phoneme or token-level information.
+    For STT-Core models, this contains phonemes, for multitask models the phones represent tokens.
+    """
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     START_TIME_FIELD_NUMBER: builtins.int
     END_TIME_FIELD_NUMBER: builtins.int
     PHONE_FIELD_NUMBER: builtins.int
+    CONFIDENCE_FIELD_NUMBER: builtins.int
     phone: builtins.str
     """The phone."""
+    confidence: builtins.float
+    """The confidence of the phone in the range [0.0, 1.0]."""
     @property
     def start_time(self) -> google.protobuf.duration_pb2.Duration:
-        """The phone's start time, in seconds."""
+        """The phone's start time."""
 
     @property
     def end_time(self) -> google.protobuf.duration_pb2.Duration:
-        """The phone's end time, in seconds."""
+        """The phone's end time."""
 
     def __init__(
         self,
@@ -664,9 +738,10 @@ class PhoneInfo(google.protobuf.message.Message):
         start_time: google.protobuf.duration_pb2.Duration | None = ...,
         end_time: google.protobuf.duration_pb2.Duration | None = ...,
         phone: builtins.str = ...,
+        confidence: builtins.float = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["end_time", b"end_time", "start_time", b"start_time"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["end_time", b"end_time", "phone", b"phone", "start_time", b"start_time"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["confidence", b"confidence", "end_time", b"end_time", "phone", b"phone", "start_time", b"start_time"]) -> None: ...
 
 global___PhoneInfo = PhoneInfo
 
