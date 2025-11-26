@@ -1,5 +1,14 @@
 # Changelog
 
+## Rust v3.3.0 - 2025-11-26
+- Support for GBNF grammar type.
+- Updated dependencies.
+## NodeJS v2.4.0 - 2025-11-26
+- Support for GBNF grammar type.
+- Updated dependencies.
+## Python v2.3.0 - 2025-11-26
+- Support for GBNF grammar type.
+
 ## Python v2.2.0 - 2025-10-14
 - Updated proto file to support new model types and performance metrics.
 ## Rust v3.2.0 - 2025-10-14
