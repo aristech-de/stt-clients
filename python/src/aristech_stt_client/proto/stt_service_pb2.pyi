@@ -92,6 +92,10 @@ class _GrammarTypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._En
     """A simple json phrase list grammar type.
     Example grammar: `["yes", "yeah", "yep", "why not", "no", "nope"]`
     """
+    GBNF: _GrammarType.ValueType  # 4
+    """GBNF grammar type.
+    Example grammar: `gbnf:root ::= "yes" | "no"`
+    """
 
 class GrammarType(_GrammarType, metaclass=_GrammarTypeEnumTypeWrapper): ...
 
@@ -110,6 +114,10 @@ Example grammar: `kws:oh mighty computer|hey computer`
 PHRASE_LIST: GrammarType.ValueType  # 2
 """A simple json phrase list grammar type.
 Example grammar: `["yes", "yeah", "yep", "why not", "no", "nope"]`
+"""
+GBNF: GrammarType.ValueType  # 4
+"""GBNF grammar type.
+Example grammar: `gbnf:root ::= "yes" | "no"`
 """
 global___GrammarType = GrammarType
 
@@ -943,24 +951,6 @@ class NLPFunction(google.protobuf.message.Message):
     def ClearField(self, field_name: typing.Literal["description", b"description", "id", b"id", "name", b"name"]) -> None: ...
 
 global___NLPFunction = NLPFunction
-
-@typing.final
-class Graph(google.protobuf.message.Message):
-    """The `Graph` message contains the information about a single graph."""
-
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-    NAME_FIELD_NUMBER: builtins.int
-    name: builtins.str
-    """The name of the graph"""
-    def __init__(
-        self,
-        *,
-        name: builtins.str = ...,
-    ) -> None: ...
-    def ClearField(self, field_name: typing.Literal["name", b"name"]) -> None: ...
-
-global___Graph = Graph
 
 @typing.final
 class AccountInfoRequest(google.protobuf.message.Message):

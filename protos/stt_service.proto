@@ -364,6 +364,9 @@ enum GrammarType {
   // A simple json phrase list grammar type.
   // Example grammar: `["yes", "yeah", "yep", "why not", "no", "nope"]`
   PHRASE_LIST = 2;
+  // GBNF grammar type.
+  // Example grammar: `gbnf:root ::= "yes" | "no"`
+  GBNF = 4;
 }
 
 // The `NLPFunctionsRequest` message currently contains no information.
@@ -392,14 +395,6 @@ message NLPFunction {
   string name = 2;
   // The nlp function description.
   string description = 3;
-}
-
-// The `Graph` message contains the information about a single graph.
-message Graph {
-  // The name of the graph
-  string name = 1;
-  reserved 2;
-  reserved "normalizers";
 }
 
 // The `AccountInfoRequest` message currently contains no information.
