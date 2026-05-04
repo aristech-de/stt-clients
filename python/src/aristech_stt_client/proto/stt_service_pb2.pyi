@@ -20,6 +20,37 @@ else:
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
+class _LanguageSelectionMode:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _LanguageSelectionModeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_LanguageSelectionMode.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    FIXED: _LanguageSelectionMode.ValueType  # 0
+    """The model is fixed to a specific language and does not perform any language selection."""
+    OPTIONAL_OR_AUTO: _LanguageSelectionMode.ValueType  # 1
+    """The model can either be used with a specified locale or it can perform automatic language selection."""
+    AUTO_ONLY: _LanguageSelectionMode.ValueType  # 2
+    """The model performs automatic language selection and does not allow to specify a locale."""
+    REQUIRED: _LanguageSelectionMode.ValueType  # 3
+    """The model requires a locale to be specified and does not perform any language selection.
+    If no locale is specified, the server will choose the first locale from the list of supported locales for the model.
+    """
+
+class LanguageSelectionMode(_LanguageSelectionMode, metaclass=_LanguageSelectionModeEnumTypeWrapper): ...
+
+FIXED: LanguageSelectionMode.ValueType  # 0
+"""The model is fixed to a specific language and does not perform any language selection."""
+OPTIONAL_OR_AUTO: LanguageSelectionMode.ValueType  # 1
+"""The model can either be used with a specified locale or it can perform automatic language selection."""
+AUTO_ONLY: LanguageSelectionMode.ValueType  # 2
+"""The model performs automatic language selection and does not allow to specify a locale."""
+REQUIRED: LanguageSelectionMode.ValueType  # 3
+"""The model requires a locale to be specified and does not perform any language selection.
+If no locale is specified, the server will choose the first locale from the list of supported locales for the model.
+"""
+global___LanguageSelectionMode = LanguageSelectionMode
+
 class _EndpointingType:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
@@ -803,6 +834,7 @@ class Model(google.protobuf.message.Message):
     SLOTS_FIELD_NUMBER: builtins.int
     EXAMPLES_FIELD_NUMBER: builtins.int
     ENDPOINTING_FIELD_NUMBER: builtins.int
+    LANGUAGE_SELECTION_MODE_FIELD_NUMBER: builtins.int
     id: builtins.str
     """The model id.
     e.g. generic-model-de-0.21
@@ -817,6 +849,8 @@ class Model(google.protobuf.message.Message):
     """The model version."""
     type: global___ModelType.ValueType
     """The model type."""
+    language_selection_mode: global___LanguageSelectionMode.ValueType
+    """Indicates how / if language selection it performed for the model."""
     @property
     def alias(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]:
         """Alias that can also be used to refer to the model instead of the id.
@@ -862,9 +896,10 @@ class Model(google.protobuf.message.Message):
         slots: collections.abc.Iterable[builtins.str] | None = ...,
         examples: collections.abc.Iterable[builtins.str] | None = ...,
         endpointing: collections.abc.Iterable[global___EndpointingType.ValueType] | None = ...,
+        language_selection_mode: global___LanguageSelectionMode.ValueType = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["nlp", b"nlp"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["alias", b"alias", "description", b"description", "endpointing", b"endpointing", "examples", b"examples", "grammar_type", b"grammar_type", "id", b"id", "locale", b"locale", "name", b"name", "nlp", b"nlp", "slots", b"slots", "type", b"type", "version", b"version"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["alias", b"alias", "description", b"description", "endpointing", b"endpointing", "examples", b"examples", "grammar_type", b"grammar_type", "id", b"id", "language_selection_mode", b"language_selection_mode", "locale", b"locale", "name", b"name", "nlp", b"nlp", "slots", b"slots", "type", b"type", "version", b"version"]) -> None: ...
 
 global___Model = Model
 
