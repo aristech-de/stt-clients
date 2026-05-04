@@ -1,5 +1,15 @@
 # Changelog
 
+## Rust v3.4.0 - 04.05.2026
+- Support for the new `LanguageSelectionMode language_selection_mode` field which allows to check how the model selects the language for recognition.
+- Updated dependencies.
+- Switched from dotenv to dotenvy because the former seems to be unmaintained.
+## NodeJS v2.5.0 - 04.05.2026
+- Support for the new `languageSelectionMode` field which allows to check how the model selects the language for recognition.
+- Updated dependencies.
+## Python v2.4.0 - 2025-11-26
+- Support for the new `language_selection_mode` field which allows to check how the model selects the language for recognition.
+
 ## Rust v3.3.0 - 2025-11-26
 - Support for GBNF grammar type.
 - Updated dependencies.
