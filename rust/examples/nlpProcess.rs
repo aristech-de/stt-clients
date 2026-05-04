@@ -9,7 +9,7 @@ use aristech_stt_client::{
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     // Load environment variables from .env file
-    dotenv::dotenv()?;
+    dotenvy::dotenv()?;
 
     let mut client = SttClientBuilder::new().build().await?;
 

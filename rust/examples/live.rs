@@ -23,7 +23,7 @@ fn f32_to_pcm16(data: &[f32]) -> Vec<u8> {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Load environment variables from .env file
-    dotenv::dotenv().ok();
+    dotenvy::dotenv().ok();
 
     // Clear the terminal
     print!("{}[2J", 27 as char);
@@ -56,12 +56,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let stream_config = device
         .default_input_config()
         .expect("Could not get default input config");
-    let sample_rate = stream_config.sample_rate().0 as i64;
+    let sample_rate = stream_config.sample_rate() as i64;
     let config = stream_config.into();
 
     println!(
         "Using input device \"{}\" @ {} Hz with configuration: {:?}",
-        device.name().unwrap(),
+        device
+            .description()
+            .map(|desc| desc.name().to_owned())
+            .unwrap_or("Unknown".to_string()),
         sample_rate,
         config
     );

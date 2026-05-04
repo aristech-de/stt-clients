@@ -1,7 +1,7 @@
 [package]
 name = "aristech-stt-client"
 description = "A Rust client library for the Aristech Speech-to-Text API"
-version = "3.3.0"
+version = "3.4.0"
 edition = "2021"
 repository = "https://github.com/aristech-de/stt-clients"
 keywords = [
@@ -17,25 +17,25 @@ license = "MIT"
 categories = ["api-bindings", "multimedia::audio"]
 
 [dependencies]
-tonic = { version = "0.14.2", features = [
+tonic = { version = "0.14.5", features = [
   "tls-ring",
   "tls-native-roots",
   "gzip",
 ] }
-tonic-prost = "0.14.2"
-tokio = { version = "1.48.0", features = ["macros", "rt-multi-thread"] }
-tokio-stream = "0.1.17"
-prost = "0.14.1"
-prost-types = "0.14.1"
+tonic-prost = "0.14.5"
+tokio = { version = "1.52.1", features = ["macros", "rt-multi-thread"] }
+tokio-stream = "0.1.18"
+prost = "0.14.3"
+prost-types = "0.14.3"
 hound = "3.5.1"
 base64 = "0.22.1"
 
 [dev-dependencies]
-dotenv = "0.15.0"
-cpal = "0.16.0"
+dotenvy = "0.15.7"
+cpal = "0.17.3"
 
 [build-dependencies]
-tonic-prost-build = "0.14.2"
+tonic-prost-build = "0.14.5"
 
 [[example]]
 name = "file"

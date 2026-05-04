@@ -329,6 +329,20 @@ message Model {
   repeated string examples = 7;
   // The supported endpointing modes.
   repeated EndpointingType endpointing = 11;
+  // Indicates how / if language selection it performed for the model.
+  LanguageSelectionMode language_selection_mode = 13;
+}
+
+enum LanguageSelectionMode {
+  // The model is fixed to a specific language and does not perform any language selection.
+  FIXED = 0;
+  // The model can either be used with a specified locale or it can perform automatic language selection.
+  OPTIONAL_OR_AUTO = 1;
+  // The model performs automatic language selection and does not allow to specify a locale.
+  AUTO_ONLY = 2;
+  // The model requires a locale to be specified and does not perform any language selection.
+  // If no locale is specified, the server will choose the first locale from the list of supported locales for the model.
+  REQUIRED = 3;
 }
 
 enum EndpointingType {

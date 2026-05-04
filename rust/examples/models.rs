@@ -5,7 +5,7 @@ use aristech_stt_client::{get_models, SttClientBuilder};
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     // Load environment variables from .env file
-    dotenv::dotenv().ok();
+    dotenvy::dotenv().ok();
 
     let mut client = SttClientBuilder::new().build().await?;
 
