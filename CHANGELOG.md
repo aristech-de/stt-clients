@@ -1,5 +1,9 @@
 # Changelog
 
+## Rust v3.5.0 - 2026-05-29
+- Updated dependencies.
+- `get_client` now walks through potential errors to provide more helpful error messages when the client cannot be created.
+
 ## Rust v3.4.0 - 04.05.2026
 - Support for the new `LanguageSelectionMode language_selection_mode` field which allows to check how the model selects the language for recognition.
 - Updated dependencies.
