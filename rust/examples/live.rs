@@ -14,7 +14,7 @@ use tonic::codegen::CompressionEncoding;
 fn f32_to_pcm16(data: &[f32]) -> Vec<u8> {
     let mut pcm16 = Vec::with_capacity(data.len() * 2);
     for sample in data {
-        let sample = (sample * std::i16::MAX as f32) as i16;
+        let sample = (sample * i16::MAX as f32) as i16;
         pcm16.extend_from_slice(&sample.to_le_bytes());
     }
     pcm16
@@ -100,7 +100,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let stream = device
         .build_input_stream(
-            &config,
+            config,
             move |data: &[f32], _| {
                 // Create a new audio request and send it to the server
                 let audio_request = StreamingRecognitionRequest {
