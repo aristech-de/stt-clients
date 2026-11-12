@@ -1,5 +1,14 @@
 # Changelog
 
+## Rust v3.5.1 - 2026-11-12
+- Updated dependencies.
+- The `live` example passes the stream config by value, which cpal 0.18 requires, and uses `i16::MAX` instead of the deprecated `std::i16::MAX`.
+## NodeJS v2.5.1 - 2026-11-12
+- Updated dependencies. `@grpc/grpc-js` 1.14.7 fixes four high-severity security advisories.
+- The package is now built with TypeScript 7.
+## Python v2.4.1 - 2026-11-12
+- Allow protobuf 7 (`protobuf>=5.26.1,<8.0.0`).
+
 ## Rust v3.5.0 - 2026-05-29
 - Updated dependencies.
 - `get_client` now walks through potential errors to provide more helpful error messages when the client cannot be created.
