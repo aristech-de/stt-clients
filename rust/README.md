@@ -85,6 +85,29 @@ let mut client = SttClientBuilder::default()
     .await?;
 ```
 
+</details>
+
+### Connect timeout
+
+By default, connecting waits as long as the operating system does. For an unreachable host that is typically about two minutes, and for a TLS server that accepts the connection but never answers the handshake it is indefinitely. To give up earlier, set a connect timeout:
+
+```rust
+use aristech_stt_client::{SttClientBuilder, ConnectTimeoutError};
+use std::time::Duration;
+
+match SttClientBuilder::new()
+    .connect_timeout(Duration::from_secs(5))
+    .build()
+    .await
+{
+    Ok(client) => { /* use the client */ }
+    Err(e) if e.downcast_ref::<ConnectTimeoutError>().is_some() => { /* the server did not answer in time */ }
+    Err(e) => return Err(e),
+}
+```
+
+Without the builder, use `get_client_with_options(host, tls_options, ConnectOptions::new().connect_timeout(...))`. The timeout only applies to establishing the connection, not to requests on an established connection.
+
 ## Build
 
 To build the library, run:

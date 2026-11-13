@@ -10,6 +10,8 @@ pub mod stt_service {
 }
 
 use std::error::Error;
+use std::fmt;
+use std::time::Duration;
 
 use stt_service::streaming_recognition_request::StreamingRequest;
 use tonic::codegen::InterceptedService;
@@ -143,6 +145,7 @@ pub struct SttClientBuilder {
     tls: bool,
     auth: Option<Auth>,
     ca_certificate: Option<String>,
+    connect_timeout: Option<Duration>,
 }
 
 impl SttClientBuilder {
@@ -190,6 +193,7 @@ impl SttClientBuilder {
                     host,
                     auth: Some(Auth::new(&api_key_data.token, &api_key_data.secret)),
                     ca_certificate,
+                    connect_timeout: None,
                 };
             }
         }
@@ -285,7 +289,7 @@ impl SttClientBuilder {
     /// async fn main() {
     ///     let client = SttClientBuilder::default()
     ///       .host("https://stt.example.com:9424").unwrap()
-    ///       .auth(Some(Auth { token: "my-token".to_string(). secret: "my-secret".to_string() }))
+    ///       .auth(Some(Auth::new("my-token", "my-secret")))
     ///       .build()
     ///       .await
     ///       .unwrap();
@@ -327,7 +331,7 @@ impl SttClientBuilder {
         if host.is_empty() {
             return Err("Host cannot be empty".into());
         }
-        if !host.starts_with("http://") && host.starts_with("https://") {
+        if host.contains("://") && !host.starts_with("http://") && !host.starts_with("https://") {
             return Err("Host must start with http:// or https://".into());
         }
         self.tls = host.starts_with("https://");
@@ -386,9 +390,101 @@ impl SttClientBuilder {
             true => Some(TlsOptions::new(self.auth, self.ca_certificate)),
             false => None,
         };
-        get_client(self.host, tls_options).await
+        let mut connect_options = ConnectOptions::new();
+        if let Some(timeout) = self.connect_timeout {
+            connect_options = connect_options.connect_timeout(timeout);
+        }
+        get_client_with_options(self.host, tls_options, connect_options).await
+    }
+
+    /// Limits how long [build](SttClientBuilder::build) waits for the connection to the server.
+    ///
+    /// See [ConnectOptions::connect_timeout] for what the limit covers.
+    ///
+    /// # Arguments
+    /// * `timeout` - The maximum time to wait for the connection.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use aristech_stt_client::SttClientBuilder;
+    /// use std::error::Error;
+    /// use std::time::Duration;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn Error>> {
+    ///     let mut client = SttClientBuilder::new()
+    ///         .connect_timeout(Duration::from_secs(5))
+    ///         .build()
+    ///         .await?;
+    ///     Ok(())
+    /// }
+    /// ```
+    pub fn connect_timeout(mut self, timeout: Duration) -> Self {
+        self.connect_timeout = Some(timeout);
+        self
     }
 }
+
+/// Options that control how the client connects to the server.
+///
+/// Create it with [ConnectOptions::new] (or `Default`) and set the options with the builder methods.
+#[derive(Clone, Debug, Default)]
+#[non_exhaustive]
+pub struct ConnectOptions {
+    /// The maximum time to wait for the connection, see [ConnectOptions::connect_timeout].
+    pub connect_timeout: Option<Duration>,
+}
+
+impl ConnectOptions {
+    /// Creates connect options without any limits, which is how [get_client] connects.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Limits how long establishing the connection may take.
+    ///
+    /// The limit covers the whole connection setup: the TCP connect and, with TLS, the TLS
+    /// handshake. When it is exceeded, connecting fails with a [ConnectTimeoutError].
+    /// Without a limit, connecting waits as long as the operating system does, which for an
+    /// unreachable host is typically about two minutes and for a TLS server that accepts the TCP
+    /// connection but never answers the handshake is indefinitely.
+    ///
+    /// The limit only applies to establishing the connection. Requests on an established
+    /// connection are not limited by it. This includes a plaintext server that accepts the TCP
+    /// connection but never answers: the connection counts as established and the first request
+    /// waits instead.
+    pub fn connect_timeout(mut self, timeout: Duration) -> Self {
+        self.connect_timeout = Some(timeout);
+        self
+    }
+}
+
+/// The error returned when the connection to the server could not be established within the
+/// [connect timeout](ConnectOptions::connect_timeout).
+///
+/// [get_client_with_options] returns it boxed, use `downcast_ref` to tell it apart from other
+/// connection errors.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ConnectTimeoutError {
+    /// The host the client tried to connect to.
+    pub host: String,
+    /// The connect timeout that was exceeded.
+    pub timeout: Duration,
+}
+
+impl fmt::Display for ConnectTimeoutError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "connect to {}: timed out after {} ms",
+            self.host,
+            self.timeout.as_millis()
+        )
+    }
+}
+
+impl Error for ConnectTimeoutError {}
 
 /// The TlsOptions struct holds the tls options needed to communicate with the server.
 #[derive(Clone, Default)]
@@ -431,6 +527,39 @@ pub async fn get_client(
     host: String,
     tls_options: Option<TlsOptions>,
 ) -> Result<SttClient, Box<dyn Error>> {
+    get_client_with_options(host, tls_options, ConnectOptions::default()).await
+}
+
+/// Creates a new [SttClient] to communicate with the server, using the given [ConnectOptions].
+///
+/// # Arguments
+/// * `host` - The host to connect to (might include the port number e.g. "https://stt.example.com:9424"). Note that the protocol must be included in the host.
+/// * `tls_options` - The tls options to use when connecting to the server. If None is given, the connection will be unencrypted and unauthenticated (the server must also be configured to communicate without encryption in this case).
+/// * `options` - Options that control how the connection is established, e.g. a connect timeout.
+///
+/// # Example
+///
+/// ```no_run
+/// use aristech_stt_client::{get_client_with_options, ConnectOptions, ConnectTimeoutError, TlsOptions};
+/// use std::error::Error;
+/// use std::time::Duration;
+///
+/// #[tokio::main]
+/// async fn main() -> Result<(), Box<dyn Error>> {
+///     let options = ConnectOptions::new().connect_timeout(Duration::from_secs(5));
+///     match get_client_with_options("https://stt.example.com".to_string(), Some(TlsOptions::default()), options).await {
+///         Ok(_client) => println!("connected"),
+///         Err(e) if e.downcast_ref::<ConnectTimeoutError>().is_some() => println!("server did not answer in time"),
+///         Err(e) => return Err(e),
+///     }
+///     Ok(())
+/// }
+/// ```
+pub async fn get_client_with_options(
+    host: String,
+    tls_options: Option<TlsOptions>,
+    options: ConnectOptions,
+) -> Result<SttClient, Box<dyn Error>> {
     // Check if a schema is included in the host
     // otherwise add http if no tls options are given and https otherwise
     let host = if host.starts_with("http://") || host.starts_with("https://") {
@@ -441,7 +570,7 @@ pub async fn get_client(
             None => format!("http://{}", host),
         }
     };
-    match tls_options {
+    let (endpoint, auth) = match tls_options {
         Some(tls_options) => {
             let tls = match tls_options.ca_certificate {
                 Some(ca_certificate) => {
@@ -450,25 +579,28 @@ pub async fn get_client(
                 }
                 None => ClientTlsConfig::with_native_roots(ClientTlsConfig::new()),
             };
-            let channel = Channel::from_shared(host.clone())?
-                .tls_config(tls)?
-                .connect()
-                .await
-                .map_err(|e| format!("connect to {}: {}", host, error_chain(&e)))?;
-            let client: SttServiceClient<InterceptedService<Channel, AuthInterceptor>> =
-                SttServiceClient::with_interceptor(channel, AuthInterceptor::new(tls_options.auth));
-            Ok(client)
+            (
+                Channel::from_shared(host.clone())?.tls_config(tls)?,
+                tls_options.auth,
+            )
         }
-        None => {
-            let channel = Channel::from_shared(host.clone())?
-                .connect()
-                .await
-                .map_err(|e| format!("connect to {}: {}", host, error_chain(&e)))?;
-            let client: SttServiceClient<InterceptedService<Channel, AuthInterceptor>> =
-                SttServiceClient::with_interceptor(channel, AuthInterceptor::new(None));
-            Ok(client)
-        }
-    }
+        None => (Channel::from_shared(host.clone())?, None),
+    };
+    // The timeout wraps the whole connect instead of using tonic's `Endpoint::connect_timeout`,
+    // which only limits the TCP connect and not the TLS handshake.
+    let connected = match options.connect_timeout {
+        Some(timeout) => tokio::time::timeout(timeout, endpoint.connect())
+            .await
+            .map_err(|_| ConnectTimeoutError {
+                host: host.clone(),
+                timeout,
+            })?,
+        None => endpoint.connect().await,
+    };
+    let channel = connected.map_err(|e| format!("connect to {}: {}", host, error_chain(&e)))?;
+    let client: SttServiceClient<InterceptedService<Channel, AuthInterceptor>> =
+        SttServiceClient::with_interceptor(channel, AuthInterceptor::new(auth));
+    Ok(client)
 }
 
 /// Gets the list of available models from the server.
@@ -583,14 +715,15 @@ pub async fn get_nlp_functions(
 ///     let mut client = get_client("https://tts.example.com".to_string(), Some(TlsOptions::default())).await?;
 ///     let response = nlp_process(&mut client, NlpProcessRequest {
 ///         text: "hello world".to_string(),
-///         nlp: Some(NlpSpec {{
+///         nlp: Some(NlpSpec {
 ///             server_config: "default".to_string(),
 ///             functions: vec![NlpFunctionSpec {
 ///                 id: "spellcheck-de".to_string(),
 ///                 ..NlpFunctionSpec::default()
 ///             }],
 ///            ..NlpSpec::default()
-///         }}),
+///         }),
+///         ..NlpProcessRequest::default()
 ///     }).await?;
 ///     println!("{:#?}", response);
 ///     Ok(())

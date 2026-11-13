@@ -1,5 +1,10 @@
 # Changelog
 
+## Rust v3.6.0 - 2026-11-13
+- Connect timeout: `SttClientBuilder::connect_timeout` and `get_client_with_options` with `ConnectOptions::connect_timeout` limit how long connecting may take, including the TLS handshake. Exceeding it fails with the new `ConnectTimeoutError`. `get_client` keeps waiting without a limit as before.
+- `SttClientBuilder::host` no longer rejects `https://` hosts. Hosts with a scheme other than `http://` or `https://` are rejected; hosts without a scheme are still accepted.
+- Fixed the doc examples of `SttClientBuilder::auth` and `nlp_process`, which did not compile.
+
 ## Rust v3.5.1 - 2026-11-12
 - Updated dependencies.
 - The `live` example passes the stream config by value, which cpal 0.18 requires, and uses `i16::MAX` instead of the deprecated `std::i16::MAX`.
